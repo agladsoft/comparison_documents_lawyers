@@ -6,11 +6,11 @@ from pathlib import Path
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-photos = UploadSet("photos", IMAGES)
+pdf = UploadSet("photos", DOCUMENTS)
 
 app.config["UPLOADED_PHOTOS_DEST"] = "static/img"
 app.config["SECRET_KEY"] = str(secrets.SystemRandom().getrandbits(128))
-configure_uploads(app, photos)
+configure_uploads(app, pdf)
 
 
 # @app.post("/upload")
