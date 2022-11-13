@@ -3,20 +3,41 @@
 
     <meta charset="UTF-8">
     <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}" type="text/css" />
     <title>File Dropper</title>
 </head>
 <body>
+<div class="parent">
+    <div class="column">
+        <form
+            method="POST"
+            action="/upload_docx"
+            class="dropzone dz-clickable"
+            id="docxForm"
+            enctype="multipart/form-data"
+        >
+        </form>
+        <textarea id="docx" name="docx" rows="15" cols="86"></textarea>
+    </div>
 
-    <form
-        method="POST"
-        action="/upload"
-        class="dropzone dz-clickable"
-        id="dropper"
-        enctype="multipart/form-data"
-    >
-    </form>
+
+    <div class="column">
+        <form
+            method="POST"
+            action="/upload"
+            class="dropzone dz-clickable"
+            id="dropper"
+            enctype="multipart/form-data"
+        >
+        </form>
+        <textarea id="pdf" name="pdf" rows="15" cols="86"></textarea>
+<!--        <button id="move" type="submit">MOVE</button>-->
+    </div>
+</div>
+
+    <button id="downloadReport" type="submit">DOWNLOAD</button>
 
     <script type="application/javascript">
         Dropzone.options.dropper = {
@@ -25,8 +46,62 @@
             forceChunking: true,
             url: "/upload",
             maxFilesize: 1025, // megabytes
-            chunkSize: 250000 // bytes
+            chunkSize: 250000, // bytes
+            success: function(file, response){
+                console.log(response);
+                $("textarea#pdf").val(response['text']);
+
+            }
         }
+
+        Dropzone.options.docxForm = {
+            success: function(file, response){
+                console.log(response);
+                $("textarea#docx").val(response);
+            }
+        }
+
+        $('#move').click(function(){
+            $.ajax({
+             url: '/move_file',
+             contentType: "application/json",
+             data: JSON.stringify({ "path": document.getElementById('pdf').value}),
+             type: 'POST',
+             success: function(response) {
+                 console.log(response)
+                 $("textarea#pdf").val(response['text'])
+             },
+             error: function(error) {
+                 console.log(error);
+             }
+            });
+        });
+
+        document.getElementById("downloadReport").onclick= async ()=> {
+            var countError = 0
+            var docx = document.getElementById('docx').value
+            var pdf = document.getElementById('pdf').value
+            const dictFile = {"docx": docx, "pdf": pdf, "countError": countError ? countError : 0}
+            console.log(dictFile)
+            let fetchPromise = await fetch("http://94.142.142.205:8000/get_disagreement/", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dictFile),
+                    mode: 'cors'
+                });
+            console.log(fetchPromise)
+            const blob = await fetchPromise.blob();
+            const newBlob = new Blob([blob]);
+            const blobUrl = window.URL.createObjectURL(newBlob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.setAttribute('download', `data.docx`);
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+        };
     </script>
+<!--    <script type="text/javascript" src="{{ url_for('static', filename='js/index.js') }}" ></script>-->
 </body>
 </html>
