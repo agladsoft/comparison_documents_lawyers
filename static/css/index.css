@@ -1,0 +1,11 @@
+.dropzone {
+    width: 90%;
+}
+.parent {
+  display: flex;
+  flex-direction:row;
+}
+
+.column {
+  flex: 1 1 0px;
+}

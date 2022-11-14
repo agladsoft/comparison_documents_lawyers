@@ -40,6 +40,7 @@
     <button id="downloadReport" type="submit">DOWNLOAD</button>
 
     <script type="application/javascript">
+        var dataJson = NaN
         Dropzone.options.dropper = {
             paramName: "file",
             chunking: true,
@@ -49,6 +50,7 @@
             chunkSize: 250000, // bytes
             success: function(file, response){
                 console.log(response);
+                dataJson = response['text']
                 $("textarea#pdf").val(response['text']);
 
             }
@@ -61,27 +63,10 @@
             }
         }
 
-        $('#move').click(function(){
-            $.ajax({
-             url: '/move_file',
-             contentType: "application/json",
-             data: JSON.stringify({ "path": document.getElementById('pdf').value}),
-             type: 'POST',
-             success: function(response) {
-                 console.log(response)
-                 $("textarea#pdf").val(response['text'])
-             },
-             error: function(error) {
-                 console.log(error);
-             }
-            });
-        });
-
         document.getElementById("downloadReport").onclick= async ()=> {
             var countError = 0
             var docx = document.getElementById('docx').value
-            var pdf = document.getElementById('pdf').value
-            const dictFile = {"docx": docx, "pdf": pdf, "countError": countError ? countError : 0}
+            const dictFile = {"docx": docx, "pdf": dataJson, "countError": countError ? countError : 0}
             console.log(dictFile)
             let fetchPromise = await fetch("http://94.142.142.205:8000/get_disagreement/", {
                     method: 'POST',
