@@ -13,3 +13,4 @@ pdfplumber~=0.7.5
 python-dotenv~=0.21.0
 fuzzywuzzy~=0.18.0
 docx2python~=2.0.4
+Flask-Cors==3.0.10
