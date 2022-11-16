@@ -14,3 +14,5 @@ python-dotenv~=0.21.0
 fuzzywuzzy~=0.18.0
 docx2python~=2.0.4
 Flask-Cors==3.0.10
+python-Levenshtein==0.20.8
+rapidfuzz==2.13.2
