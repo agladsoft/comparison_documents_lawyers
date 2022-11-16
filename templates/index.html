@@ -10,7 +10,7 @@
 </head>
 <body>
     <label for="countError"> Количество ошибок в абзаце</label>
-    <input class="number" type="number" id="countError" />
+    <input class="number form-field" type="number" id="countError" />
     <div class="parent">
         <div class="column">
             <form
@@ -21,7 +21,7 @@
                 enctype="multipart/form-data"
             >
             </form>
-            <textarea id="docx" name="docx" rows="15" cols="86"></textarea>
+            <textarea id="docx" class="textarea_style" name="docx" rows="15" cols="86"></textarea>
         </div>
 
 
@@ -34,14 +34,13 @@
                 enctype="multipart/form-data"
             >
             </form>
-            <textarea id="pdf" name="pdf" rows="15" cols="86"></textarea>
+            <textarea id="pdf" class="textarea_style" name="pdf" rows="15" cols="86"></textarea>
         </div>
     </div>
 
-    <button id="downloadReport" type="submit">DOWNLOAD</button>
+    <button id="downloadReport" class="custom-btn btn-13" type="submit">DOWNLOAD</button>
 
     <script type="application/javascript">
-        var dataJson = NaN
         Dropzone.options.dropper = {
             paramName: "file",
             chunking: true,
@@ -51,7 +50,6 @@
             chunkSize: 250000, // bytes
             success: function(file, response){
                 console.log(response);
-                dataJson = response['text']
                 $("textarea#pdf").val(response['text']);
 
             }
@@ -67,7 +65,8 @@
         document.getElementById("downloadReport").onclick= async ()=> {
             var countError = parseInt(document.getElementById('countError').value);
             var docx = document.getElementById('docx').value
-            const dictFile = {"docx": docx, "pdf": dataJson, "countError": countError ? countError : 0}
+            var pdf = document.getElementById('pdf').value
+            const dictFile = {"docx": docx, "pdf": pdf, "countError": countError ? countError : 0}
             console.log(dictFile)
             let fetchPromise = await fetch("http://94.142.142.205:8000/get_disagreement/", {
                     method: 'POST',

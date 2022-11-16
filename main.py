@@ -88,7 +88,6 @@ class PDF(object):
         for f1 in filenames:
             with open(f1, 'r') as infile:
                 result.extend(json.load(infile))
-
         with open(file_name, 'w') as output_file:
             json.dump(result, output_file, indent=4, ensure_ascii=False)
             return output_file
@@ -150,8 +149,7 @@ class PDF(object):
                         if os.path.join(root, name) not in filenames:
                             filenames.append(os.path.join(root, name))
                             filenames = sorted(filenames,
-                                               key=lambda x: int(re.findall(r'\d{1,5}', re.split("[.]pdf", x)[1])
-                                                                 [0]))
+                                               key=lambda x: int(re.findall(r'\d{1,5}', re.split("[.]pdf", x)[1])[0]))
                         infinite_loop = len(filenames) != total_pages
         logger.info(f"All needed files {filenames}")
         return self.concatenate_files(f"{path_root_completed_files}/{file}.txt", filenames)
