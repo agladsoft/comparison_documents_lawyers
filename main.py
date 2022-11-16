@@ -4,10 +4,10 @@ import json
 import shutil
 import PyPDF2
 import enchant
-from . import *
 import contextlib
 import subprocess
 import pdfplumber
+from __init__ import *
 from pathlib import Path
 from fuzzywuzzy import process
 from docx2python import docx2python
