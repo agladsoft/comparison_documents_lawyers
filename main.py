@@ -9,6 +9,7 @@ import subprocess
 import pdfplumber
 from __init__ import *
 from pathlib import Path
+from collections import deque
 from fuzzywuzzy import process
 from docx2python import docx2python
 from typing import TextIO, Union, List
@@ -23,22 +24,28 @@ class Docx(object):
     @staticmethod
     def clean_special_chars(lst: List[str]) -> List[str]:
         lst = [s.replace(u"\u202F", " ") for s in lst]
+        lst = [re.sub(' +', ' ', s) for s in lst]
         return lst
 
     @staticmethod
     def get_paragraph_starts(docx_text: List[str], pdf_text: List[str]) -> List[int]:
-        index_paragraph = 0
-        p_starts = set()
+        # index_paragraph = 0
+        # p_starts = set()
+        p_starts = deque([0, 0])
         for dl in docx_text:
             if len(dl) < 3:
                 continue
             i = min(70, len(dl))
             prefix = dl[:i]
-            pls = process.extract(prefix, pdf_text[index_paragraph:], limit=1)
+            # pls = process.extract(prefix, pdf_text[index_paragraph:], limit=1)
+            pls = process.extract(prefix, pdf_text[p_starts[-2]:], limit=3)
             pl = pls[0][0]
-            index_paragraph = pdf_text.index(pl)
-            p_starts.add(index_paragraph)
-        return sorted(p_starts)
+            new_index = pdf_text.index(pl)
+            p_starts.append(new_index)
+        return sorted(set(p_starts))
+        #     index_paragraph = pdf_text.index(pl)
+        #     p_starts.add(index_paragraph)
+        # return sorted(p_starts)
 
     def format_paragraphs(self, docx_text: List[str], pdf_text: List[str]) -> str:
         docx_text = self.clean_special_chars(docx_text)
