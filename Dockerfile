@@ -34,14 +34,13 @@
 #COPY . .
 
 
-
-
-
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update
+RUN apt-get update && apt-get -y upgrade && \
+    apt-get -y install python3.8 && \
+    apt update && apt install python3-pip -y
 
 # Method1 - installing LibreOffice and java
 RUN apt-get --no-install-recommends install libreoffice -y
@@ -56,3 +55,5 @@ ADD . .
 
 # copying input doc/docx files to the docker's linux
 COPY . .
+
+RUN pip install -r requirements.txt
