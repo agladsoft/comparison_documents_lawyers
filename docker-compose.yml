@@ -12,6 +12,7 @@ services:
     environment:
       PATH_ROOT_COMPLETED_FILES: ${PATH_DOCKER_COMPLETED_FILES}
       PATH_ROOT: ${PATH_DOCKER}
+      PATH_DOCUMENTS: ${PATH_DOCKER_DOCUMENTS}
     build:
       context: ./
       dockerfile: ./Dockerfile
