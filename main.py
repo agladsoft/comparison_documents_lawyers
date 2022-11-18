@@ -1,5 +1,4 @@
 import re
-import os
 import json
 import shutil
 import PyPDF2
@@ -61,22 +60,22 @@ class Docx(object):
             else:
                 current_paragraph = current_paragraph.replace("\n", " ")
                 current_paragraph += pl
-        with open(f"{os.environ.get('PATH_DOCUMENTS')}/paragraphs.txt", "w") as f:
+        with open(f"{os.path.dirname(self.absolute_path_filename)}/paragraphs.txt", "w") as f:
             f.writelines(paragraphs)
         return "".join(paragraphs)
 
     def get_text(self) -> str:
         docx_text = docx2python(self.absolute_path_filename)
         subprocess.check_output(['libreoffice', '--convert-to', 'pdf', self.absolute_path_filename, '--outdir',
-                                 os.environ.get('PATH_DOCUMENTS')])
+                                 os.path.dirname(self.absolute_path_filename)])
         texts = pdfplumber.open(self.absolute_path_filename.replace(".docx", ".pdf"))
         list_pdf_text = []
         for text in texts.pages:
             list_pdf_text.extend(line.strip() + '\n' for line in text.extract_text().split('\n'))
         list_docx_text = [line.strip() + '\n' for line in docx_text.text.split('\n')]
-        with open(f"{os.environ.get('PATH_DOCUMENTS')}/list_pdf_text.txt", "w") as f:
+        with open(f"{os.path.dirname(self.absolute_path_filename)}/list_pdf_text.txt", "w") as f:
             f.writelines(list_pdf_text)
-        with open(f"{os.environ.get('PATH_DOCUMENTS')}/list_docx_text.txt", "w") as f:
+        with open(f"{os.path.dirname(self.absolute_path_filename)}/list_docx_text.txt", "w") as f:
             f.writelines(list_docx_text)
         return self.format_paragraphs(list_docx_text, list_pdf_text)
 

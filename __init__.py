@@ -1,3 +1,4 @@
+import os
 import logging
 from flask import Flask
 from flask_cors import CORS
@@ -15,5 +16,5 @@ if logger.hasHandlers():
 logger.addHandler(console)
 logger.setLevel(logging.INFO)
 
-dir_name_docx = "static/documents/docx"
-dir_name_pdf = "static/documents/pdf"
+dir_name_docx = f"{os.environ.get('PATH_DOCUMENTS')}/docx"
+dir_name_pdf = f"{os.environ.get('PATH_DOCUMENTS')}/pdf"
