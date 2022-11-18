@@ -3,7 +3,7 @@ import os
 import json
 import shutil
 import PyPDF2
-# import enchant
+import enchant
 import contextlib
 import subprocess
 import pdfplumber
@@ -94,14 +94,14 @@ class PDF(object):
 
     @staticmethod
     def remove_empty_lines(file_name: str) -> str:
-        # dictionary = enchant.Dict("ru_RU")
+        dictionary = enchant.Dict("ru_RU")
         file_name_without_character = f'{file_name}_without_character.txt'
         with open(file_name, "r", encoding="utf-8") as f:
             with open(file_name_without_character, 'w') as f2:
                 data = f.read()
                 for line in data.split("\n"):
                     with contextlib.suppress(Exception):
-                        if len(line.strip()) < 10:
+                        if len(line.strip()) < 10 and not dictionary.check(line.strip().split()[1]):
                             continue
                         else:
                             f2.write(line + "\n")
