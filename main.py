@@ -54,6 +54,8 @@ class Docx(object):
             else:
                 current_paragraph = current_paragraph.replace("\n", " ")
                 current_paragraph += pl
+        with open(f"{os.path.dirname(self.absolute_path_filename)}/paragraphs.txt", "w") as f:
+            f.writelines(paragraphs)
         return "".join(paragraphs)
 
     def get_text(self) -> str:
