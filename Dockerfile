@@ -45,6 +45,7 @@ RUN apt-get update && apt-get -y upgrade && \
 # Method1 - installing LibreOffice and java
 RUN apt-get --no-install-recommends install libreoffice -y
 RUN apt-get install -y libreoffice-java-common
+RUN apt-get install libenchant1c2a
 
 # Method2 - additionally installing unoconv
 RUN apt-get install unoconv
