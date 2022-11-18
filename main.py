@@ -65,6 +65,10 @@ class Docx(object):
         for text in texts.pages:
             list_pdf_text.extend(line.strip() + '\n' for line in text.extract_text().split('\n'))
         list_docx_text = [line.strip() + '\n' for line in docx_text.text.split('\n')]
+        with open(f"{os.path.dirname(self.absolute_path_filename)}/list_pdf_text.txt", "w") as f:
+            f.writelines(list_pdf_text)
+        with open(f"{os.path.dirname(self.absolute_path_filename)}/list_docx_text.txt", "w") as f:
+            f.writelines(list_docx_text)
         return self.format_paragraphs(list_docx_text, list_pdf_text)
 
 
