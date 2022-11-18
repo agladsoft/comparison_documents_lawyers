@@ -94,6 +94,7 @@ class PDF(object):
 
     @staticmethod
     def remove_empty_lines(file_name: str) -> str:
+        logger.info(f"{enchant.list_languages()}")
         dictionary = enchant.Dict("ru_RU")
         file_name_without_character = f'{file_name}_without_character.txt'
         with open(file_name, "r", encoding="utf-8") as f:
