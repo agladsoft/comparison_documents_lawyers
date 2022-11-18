@@ -68,7 +68,7 @@
             var pdf = document.getElementById('pdf').value
             const dictFile = {"docx": docx, "pdf": pdf, "countError": countError ? countError : 0}
             console.log(dictFile)
-            let fetchPromise = await fetch("http://94.142.142.205:8000/get_disagreement/", {
+            let fetchPromise = await fetch("http://10.23.4.205:8000/get_disagreement/", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(dictFile),
