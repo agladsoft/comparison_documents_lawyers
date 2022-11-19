@@ -198,7 +198,7 @@ def upload_chunk() -> Union[Response, str]:
 @app.post("/upload_docx")
 def upload_docx() -> str:
     file = request.files['file']
-    absolute_path_filename = f"{dir_name_docx}/{file.filename}"
+    absolute_path_filename = f"{dir_name_docx}/docx.docx"
     file.save(absolute_path_filename)
     docx = Docx(absolute_path_filename)
     return docx.get_text()
