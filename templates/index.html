@@ -77,6 +77,8 @@
             console.log(fetchPromise);
             const response = await fetchPromise.json();
             console.log(response);
+            $("textarea#docx").val(response['docx']);
+            $("textarea#pdf").val(response['pdf']);
         }
 
         document.getElementById("downloadReport").onclick= async ()=> {
