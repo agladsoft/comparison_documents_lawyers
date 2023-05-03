@@ -68,16 +68,15 @@
             var docx = document.getElementById('docx').value
             var pdf = document.getElementById('pdf').value
             const dictFile = {"docx": docx, "pdf": pdf}
-            console.log(dictFile)
             let fetchPromise = await fetch("http://10.23.4.205:5005/unified/", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(dictFile),
                     mode: 'cors'
                 });
-            console.log(fetchPromise)
-            const blob = await fetchPromise.blob();
-            const newBlob = new Blob([blob]);
+            console.log(fetchPromise);
+            const response = await fetchPromise.json();
+            console.log(response);
         }
 
         document.getElementById("downloadReport").onclick= async ()=> {
