@@ -38,6 +38,8 @@
         </div>
     </div>
 
+    <button id="unified" class="custom-btn btn-13" type="submit">UNIFIED</button>
+
     <button id="downloadReport" class="custom-btn btn-13" type="submit">DOWNLOAD</button>
 
     <script type="application/javascript">
@@ -61,6 +63,21 @@
                 $("textarea#docx").val(response);
             }
         }
+
+        document.getElementById("unified").onclick= async ()=> {
+            var docx = document.getElementById('docx').value
+            var pdf = document.getElementById('pdf').value
+            const dictFile = {"docx": docx, "pdf": pdf}
+            console.log(dictFile)
+            let fetchPromise = await fetch("http://10.23.4.205:5005/unified/", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dictFile),
+                    mode: 'cors'
+                });
+            console.log(fetchPromise)
+            const blob = await fetchPromise.blob();
+            const newBlob = new Blob([blob]);
 
         document.getElementById("downloadReport").onclick= async ()=> {
             var countError = parseInt(document.getElementById('countError').value);
