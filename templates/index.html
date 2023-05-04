@@ -80,6 +80,7 @@
             console.log(response);
             $("textarea#docx").val(response['docx']);
             $("textarea#pdf").val(response['pdf']);
+            alert('Унификация завершена!');
         }
 
         document.getElementById("downloadReport").onclick= async ()=> {
