@@ -31,6 +31,7 @@ body::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb {
 }
 
 .textarea_style {
+    width: 90%;
     border: 2px solid #1E90FF;
     border-radius: 5px;
 	padding: 3px;
