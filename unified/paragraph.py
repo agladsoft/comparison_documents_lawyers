@@ -424,14 +424,14 @@ class MatchedChapter(object):
 
 
 class MatchedChapterByToken(MatchedChapter):
-    # def __init__(self, left_chapter: ChapterSide, right_chapter: ChapterSide, nbrs: tuple = (None, None),
+    # def __init__.py(self, left_chapter: ChapterSide, right_chapter: ChapterSide, nbrs: tuple = (None, None),
     #              born_border_match: float = None):
     #     # combined_text = ' '.join([p.symbols for p in right_chapter.paragraphs.values()])
     #     # paragraph = Paragraph(symbols=combined_text, position=[right_chapter.start_id], nbrs=(None, None))
     #     # right_chapter = ChapterSide(paragraphs={right_chapter.start_id: paragraph},
     #     #                             start_id=right_chapter.start_id,
     #     #                             end_id=right_chapter.start_id)
-    #     super().__init__(left_chapter, right_chapter, nbrs, born_border_match)
+    #     super().__init__.py(left_chapter, right_chapter, nbrs, born_border_match)
 
     def _get_right_tokens(self):
         """

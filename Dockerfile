@@ -1,13 +1,3 @@
-#FROM python:3.8
-#
-#WORKDIR ./
-#
-#COPY requirements.txt requirements.txt
-#RUN pip install -r requirements.txt
-#
-#COPY . .
-
-
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND noninteractive
