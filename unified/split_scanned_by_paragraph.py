@@ -85,7 +85,7 @@ def get_unified_data():
         # right_text_by_lines.append('\n')
         return right_text_by_lines
 
-    MAX_THR = 200
+    MAX_THR = response["threshold"]
 
     left_text = response["docx"].split("\n")
     right_text = response["pdf"].split("\n")

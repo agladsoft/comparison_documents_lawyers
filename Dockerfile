@@ -16,9 +16,7 @@ RUN apt-get install unoconv
 
 ARG CACHEBUST=1
 
-ADD . .
-
 # copying input doc/docx files to the docker's linux
-COPY . .
+COPY requirements.txt .
 
 RUN pip install -r requirements.txt

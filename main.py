@@ -209,8 +209,7 @@ def upload_docx() -> str:
 @app.post("/get_disagreement/")
 def get_disagreement():
     response = request.json
-    file = save_disagreement(response["docx"], response["pdf"], response["countError"])
-    return file
+    return save_disagreement(response["docx"], response["pdf"], response["countError"])
 
 
 @app.post("/unified/")

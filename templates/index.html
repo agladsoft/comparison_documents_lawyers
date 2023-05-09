@@ -12,6 +12,9 @@
 <div style="margin-left: 4%">
     <label for="countError"> Количество ошибок в абзаце</label>
     <input class="number form-field" type="number" id="countError" />
+
+    <label for="countError"> Порог</label>
+    <input class="number form-field" type="number" id="threshold" />
     <div class="parent">
         <div class="column">
             <form
@@ -92,9 +95,10 @@
 
         document.getElementById("unified").onclick= async ()=> {
             alert('Унификация началась!');
-            var docx = document.getElementById('docx').value
-            var pdf = document.getElementById('pdf').value
-            const dictFile = {"docx": docx, "pdf": pdf}
+            var threshold = parseInt(document.getElementById('threshold').value);
+            var docx = document.getElementById('docx').value;
+            var pdf = document.getElementById('pdf').value;
+            const dictFile = {"docx": docx, "pdf": pdf, "threshold": threshold ? threshold : 200};
             let fetchPromise = await fetch("http://10.23.4.205:5000/unified/", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -107,7 +111,7 @@
             $("textarea#docx").val(response['docx']);
             $("textarea#pdf").val(response['pdf']);
             alert('Унификация завершена!');
-        }
+        };
 
         document.getElementById("downloadReport").onclick= async ()=> {
             var countError = parseInt(document.getElementById('countError').value);
