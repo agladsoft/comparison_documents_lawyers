@@ -1,10 +1,11 @@
+import difflib
 import io
 import re
 import logging
-import difflib
 from docx import Document
-from docx.shared import Inches
 from docx.enum.text import WD_COLOR_INDEX
+from docx.shared import Inches
+
 from difference_between_files.acceptable import replacements, skips
 
 logging.basicConfig(level=logging.DEBUG)
@@ -80,7 +81,7 @@ def filter_diffs(diffs):
             for n, dif in enumerate(diffs[num:]):
                 number = n + num
                 if result == dif[0][:7]:
-                    duplicate.append((num, number, (diffs[num][1], diffs[number][0])))
+                    duplicate.append((num, number, (diffs[number][0],diffs[num][1])))
                     break
 
     duplicate.reverse()
@@ -110,12 +111,13 @@ def save_disagreement(file1: str, file2: str, count_error: int) -> io.BytesIO:
     list1, list2 = list_from_string(file1), list_from_string(file2)
     diffs = get_diff(list1, list2)
     diffs = filter_diffs(diffs)
+    number_flag = ''
     for diff in diffs:
         match_number = re.search(r"^(\.?,?\d{0,2}){0,4} ?", diff[0])
         number = match_number[0] if match_number else ""
         if not number:
-            match_number = re.search(r"^(\.?,?\d{0,2}){0,4} ?", diff[1])
-            number = match_number[0] if match_number else ""
+            number = 'Частично ' + number_flag if 'Частично' not in number_flag else number_flag
+        number_flag = number
         text1, text2 = [re.sub(r"(?:^(\.?,?\d{0,2}){0,4} ?|\.?,?$)", "", text).strip() for text in diff]
         cells = table.add_row().cells
         cells[0].width = Inches(0.6)
