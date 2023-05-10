@@ -5,6 +5,7 @@ import logging
 from docx import Document
 from docx.enum.text import WD_COLOR_INDEX
 from docx.shared import Inches
+from string import punctuation
 
 from difference_between_files.acceptable import replacements, skips
 
@@ -12,41 +13,12 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('Documents')
 
 
-def list_unpacking(paragraphs):
-    document = []
-    logger.info('Delete duplicates')
-    for n, paragraph in enumerate(paragraphs):
-        result = [i for i in re.findall('(\.*,?\d{1,2}){1,4}\.?,? ?', paragraph) if '.' in i and 6 < paragraph.index(i)]
-        for i in sorted(result, reverse=True):
-            number = ''.join(
-                [i for i in paragraph[paragraph.index(i) - 4:paragraph.index(i) + 6] if i == '.' or i.isdigit()]).strip(
-                '.')
-            try:
-                start_index = paragraph.index(number)
-                if ''.join([paragraph[start_index - 3], paragraph[start_index - 2],
-                            paragraph[start_index - 1]]).lower().strip() == 'п.':
-                    continue
-                paragraphs[n] = paragraph[:start_index].strip()
-                document.append((n + 1, paragraph[start_index:].strip()))
-            except Exception:
-                ...
 
-    for i in sorted(document, key=lambda x: x[0], reverse=True):
-        paragraphs.insert(i[0], i[1])
-    return paragraphs
 
 
 def list_from_string(document: str) -> list:
-    paragraphs = ['']
-    logger.info('Read file')
-    for paragraph in document.split("\n"):
-        if re.search('^(\.?,?\d{1,2}){1,4}\.?,? ?', paragraph):
-            paragraphs.append(
-                re.sub(r"\ {2,}", " ", paragraph).replace("\xa0", " ").strip())
-        else:
-            paragraphs[-1] += re.sub(r"\ {2,}", " ", paragraph).replace("\xa0", " ").strip()
-    paragraphs = list_unpacking(paragraphs)
-    return paragraphs
+    lst = [i.replace('®', '').replace('', '') for i in document.split('\n\n')]
+    return lst
 
 
 def get_diff(list1: list, list2: list) -> list:
@@ -57,6 +29,7 @@ def get_diff(list1: list, list2: list) -> list:
     second_column = ""
     logger.info('Find error')
     for diff in diff_items:
+        diff = diff.strip('®')
         if diff[0] == "-":
             if current_flag:
                 diffs.append((first_column, second_column))
@@ -76,11 +49,11 @@ def get_diff(list1: list, list2: list) -> list:
 def filter_diffs(diffs):
     duplicate = []
     for num, diff in enumerate(diffs):
-        if not diff[0]:
-            result = diff[1][:7]
+        if not diff[1]:
+            result = diff[0][:7]
             for n, dif in enumerate(diffs[num:]):
                 number = n + num
-                if result == dif[0][:7]:
+                if result == dif[1][:7]:
                     duplicate.append((num, number, (diffs[number][0],diffs[num][1])))
                     break
 
@@ -115,7 +88,7 @@ def save_disagreement(file1: str, file2: str, count_error: int) -> io.BytesIO:
     for diff in diffs:
         match_number = re.search(r"^(\.?,?\d{0,2}){0,4} ?", diff[0])
         number = match_number[0] if match_number else ""
-        if not number:
+        if not number or number.isspace():
             number = 'Частично ' + number_flag if 'Частично' not in number_flag else number_flag
         number_flag = number
         text1, text2 = [re.sub(r"(?:^(\.?,?\d{0,2}){0,4} ?|\.?,?$)", "", text).strip() for text in diff]
