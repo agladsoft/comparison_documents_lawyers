@@ -13,8 +13,13 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('Documents')
 
 
-
-
+class DiffData:
+    def __init__(self, current_number, last_known_number, first_column, second_column,is_different):
+        self.current_number = current_number
+        self.last_known_number = last_known_number
+        self.first_column = first_column
+        self.second_column = second_column
+        self.is_different= is_different
 
 def list_from_string(document: str) -> list:
     lst = [i.replace('®', '').replace('', '') for i in document.split('\n\n')]
@@ -22,28 +27,20 @@ def list_from_string(document: str) -> list:
 
 
 def get_diff(list1: list, list2: list) -> list:
-    diff_items = difflib.ndiff(list1, list2)
-    diffs = []
-    current_flag = None
-    first_column = ""
-    second_column = ""
-    logger.info('Find error')
-    for diff in diff_items:
-        diff = diff.strip('®')
-        if diff[0] == "-":
-            if current_flag:
-                diffs.append((first_column, second_column))
-                second_column = ""
-            first_column = diff[2:]
-            current_flag = "-"
-        elif diff[0] == "+":
-            if current_flag == "+":
-                diffs.append((first_column, second_column))
-                first_column = ""
-            second_column = diff[2:]
-            current_flag = "+"
+    last_known_number = ''
+    for text1,text2 in zip(list1,list2):
+        diff_items = difflib.ndiff([text1], [text2])
+        logger.info('Find error')
+        for diff in diff_items:
+            diff = diff.strip('®')
+            is_different = diff[0] in ('+','-')
+            break
+        match_number = re.search(r"^(\.?,?\d{0,2}){0,4} ?", text1)
+        current_number = match_number[0] if match_number and not match_number[0].isspace() else ""
+        last_known_number = current_number if current_number else last_known_number
+        diffs_data = DiffData(current_number=current_number,last_known_number=last_known_number,first_column=text1,second_column=text2,is_different=is_different)
 
-    return diffs
+        yield diffs_data
 
 
 def filter_diffs(diffs):
@@ -54,7 +51,7 @@ def filter_diffs(diffs):
             for n, dif in enumerate(diffs[num:]):
                 number = n + num
                 if result == dif[1][:7]:
-                    duplicate.append((num, number, (diffs[number][0],diffs[num][1])))
+                    duplicate.append((num, number, (diffs[number][0], diffs[num][1])))
                     break
 
     duplicate.reverse()
@@ -62,7 +59,6 @@ def filter_diffs(diffs):
     for i in duplicate:
         diffs.pop(i[1])
         diffs[i[0]] = i[2]
-
     return diffs
 
 
@@ -82,16 +78,16 @@ def save_disagreement(file1: str, file2: str, count_error: int) -> io.BytesIO:
     heading_cells[2].width = Inches(3)
 
     list1, list2 = list_from_string(file1), list_from_string(file2)
-    diffs = get_diff(list1, list2)
-    diffs = filter_diffs(diffs)
+    diffs = list(get_diff(list1, list2))
     number_flag = ''
     for diff in diffs:
-        match_number = re.search(r"^(\.?,?\d{0,2}){0,4} ?", diff[0])
-        number = match_number[0] if match_number else ""
-        if not number or number.isspace():
-            number = 'Частично ' + number_flag if 'Частично' not in number_flag else number_flag
-        number_flag = number
-        text1, text2 = [re.sub(r"(?:^(\.?,?\d{0,2}){0,4} ?|\.?,?$)", "", text).strip() for text in diff]
+        if not diff.is_different:
+            continue
+        if not diff.last_known_number and not diff.current_number:
+            number = ''
+        else:
+            number = diff.last_known_number + ' частично ' if not diff.current_number else diff.current_number
+        text1, text2 = [re.sub(r"(?:^(\.?,?\d{0,2}){0,4} ?|\.?,?$)", "", text).strip() for text in [diff.first_column, diff.second_column]]
         cells = table.add_row().cells
         cells[0].width = Inches(0.6)
         cells[1].width = Inches(3)
