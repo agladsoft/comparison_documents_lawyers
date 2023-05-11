@@ -10,11 +10,11 @@
 </head>
 <body>
 <div style="margin-left: 4%">
-    <label class="textarea_style" for="countError"> Количество ошибок в абзаце</label>
-    <input class="number form-field" type="number" id="countError" />
+    <label class="textarea_style" for="countError"> Минимальное количество ошибок в абзаце</label>
+    <input value="0" class="number form-field" type="number" id="countError" />
 
     <label class="textarea_style" for="threshold"> Интенсивность разбивки на блоки текста</label>
-    <input class="number form-field" type="number" id="threshold" />
+    <input value="200" class="number form-field" type="number" id="threshold" />
     <div class="parent">
         <div class="column">
             <form
@@ -98,7 +98,7 @@
             var threshold = parseInt(document.getElementById('threshold').value);
             var docx = document.getElementById('docx').value;
             var pdf = document.getElementById('pdf').value;
-            const dictFile = {"docx": docx, "pdf": pdf, "threshold": threshold ? threshold : 200};
+            const dictFile = {"docx": docx, "pdf": pdf, "threshold": threshold};
             let fetchPromise = await fetch("http://10.23.4.205:5000/unified/", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -118,7 +118,7 @@
             var countError = parseInt(document.getElementById('countError').value);
             var docx = document.getElementById('docx').value
             var pdf = document.getElementById('pdf').value
-            const dictFile = {"docx": docx, "pdf": pdf, "countError": countError ? countError : 0}
+            const dictFile = {"docx": docx, "pdf": pdf, "countError": countError}
             console.log(dictFile)
             let fetchPromise = await fetch("http://10.23.4.205:5000/get_disagreement/", {
                     method: 'POST',
