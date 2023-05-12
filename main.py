@@ -188,6 +188,7 @@ def index() -> str:
 @app.post("/upload")
 def upload_chunk() -> Union[Response, str]:
     file = request.files['file']
+    logger.info(f"Filename is {file.filename}")
     absolute_path_filename = f"{dir_name_pdf}/{file.filename}"
     pdf = PDF(file, absolute_path_filename)
     pdf.join_chunks_in_file()
