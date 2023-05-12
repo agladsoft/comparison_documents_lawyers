@@ -86,7 +86,7 @@ def save_disagreement(file1: str, file2: str, count_error: int) -> io.BytesIO:
         if not diff.last_known_number and not diff.current_number:
             number = ''
         else:
-            number = diff.last_known_number + ' частично ' if not diff.current_number else diff.current_number
+            number = diff.last_known_number + ' ✓ '  if not diff.current_number else diff.current_number
         text1, text2 = [re.sub(r"(?:^(\.?,?\d{0,2}){0,4} ?|\.?,?$)", "", text).strip() for text in [diff.first_column, diff.second_column]]
         cells = table.add_row().cells
         cells[0].width = Inches(0.6)

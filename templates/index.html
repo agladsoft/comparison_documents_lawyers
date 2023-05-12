@@ -8,12 +8,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}" type="text/css" />
     <title>File Dropper</title>
 </head>
-<body>
+<body onload="myFunction()">
 <div style="margin-left: 4%">
-    <label class="textarea_style" for="countError"> Минимальное количество ошибок в абзаце</label>
+    <label class="textarea_style" for="countError"> Возможное количество ошибок в абзаце</label>
     <input value="0" class="number form-field" type="number" id="countError" />
 
-    <label class="textarea_style" for="threshold"> Интенсивность разбивки на блоки текста</label>
+    <label class="textarea_style" for="threshold"> Интенсивность разбивки</label>
     <input value="200" class="number form-field" type="number" id="threshold" />
     <div class="parent">
         <div class="column">
@@ -41,10 +41,10 @@
             <textarea id="pdf" class="textarea_style" name="pdf" rows="25" cols="86"></textarea>
         </div>
     </div>
+    <div id="loader"></div>
+    <button id="unified" class="custom-btn btn-13" type="submit">УНИФИЦИРОВАТЬ</button>
 
-    <button id="unified" class="custom-btn btn-13" type="submit">UNIFIED</button>
-
-    <button id="downloadReport" class="custom-btn btn-13" type="submit">DOWNLOAD</button>
+    <button id="downloadReport" class="custom-btn btn-13" type="submit">СКАЧАТЬ</button>
 </div>
     <script type="application/javascript">
         Dropzone.options.dropper = {
@@ -68,64 +68,40 @@
             }
         }
 
-        jQuery(document).ready(function($) {
-                window.realAlert=window.alert
-                window.alert=function(s){
-                    customAlert(s)
-                }
-
-                function customAlert(s) {
-                    if($('#customalert')[0]) {
-                        if($('#customalert').hasClass('on')) {
-                            $('#customalert').find('.alerttext').html(s);
-                        }else{
-                            $('#customalert').addClass('on').find('.alerttext').html(s);
-                        }
-                    }else{
-                        $('body').append('<div id="customalert" class="on"><span class="alerttext">' + s + '</span><span id="contact-remove-sign"></span></div>');
-                    }
-                    $('#customalert').fadeIn(1500);
-                }
-
-                $(document).on('click', '#customalert', function(){
-                    $(this).removeClass('on').fadeOut();
-                });
-
-            });
-
         document.getElementById("unified").onclick= async ()=> {
-            alert('Унификация началась!');
             var threshold = parseInt(document.getElementById('threshold').value);
             var docx = document.getElementById('docx').value;
             var pdf = document.getElementById('pdf').value;
             const dictFile = {"docx": docx, "pdf": pdf, "threshold": threshold};
+            document.getElementById("loader").style.display = "block";
             let fetchPromise = await fetch("http://10.23.4.205:5000/unified/", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(dictFile),
                     mode: 'cors'
                 });
+            document.getElementById("loader").style.display = "none";
             console.log(fetchPromise);
             const response = await fetchPromise.json();
             console.log(response);
             $("textarea#docx").val(response['docx']);
             $("textarea#pdf").val(response['pdf']);
-            alert('Унификация завершена!');
         };
 
         document.getElementById("downloadReport").onclick= async ()=> {
-            alert('Данные сравниваются!');
             var countError = parseInt(document.getElementById('countError').value);
             var docx = document.getElementById('docx').value
             var pdf = document.getElementById('pdf').value
             const dictFile = {"docx": docx, "pdf": pdf, "countError": countError}
             console.log(dictFile)
+            document.getElementById("loader").style.display = "block";
             let fetchPromise = await fetch("http://10.23.4.205:5000/get_disagreement/", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(dictFile),
                     mode: 'cors'
                 });
+            document.getElementById("loader").style.display = "none";
             console.log(fetchPromise)
             const blob = await fetchPromise.blob();
             const newBlob = new Blob([blob]);
