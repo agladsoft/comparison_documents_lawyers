@@ -55,7 +55,6 @@ body::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb {
     color: #fff;
     margin-left: 42.5%;
     border-radius: 5px;
-    padding: 10px 25px;
     font-family: 'Lato', sans-serif;
     font-weight: 500;
     background: transparent;
