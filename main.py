@@ -4,9 +4,7 @@ import shutil
 import PyPDF2
 import enchant
 import contextlib
-import subprocess
-import pdfplumber
-from docx import Docx
+from docx_ import Docx
 from __init__ import *
 from pathlib import Path
 from typing import TextIO, Union
