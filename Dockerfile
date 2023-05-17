@@ -1,13 +1,3 @@
-#FROM python:3.8
-#
-#WORKDIR ./
-#
-#COPY requirements.txt requirements.txt
-#RUN pip install -r requirements.txt
-#
-#COPY . .
-
-
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -26,9 +16,7 @@ RUN apt-get install unoconv
 
 ARG CACHEBUST=1
 
-ADD . .
-
 # copying input doc/docx files to the docker's linux
-COPY . .
+COPY requirements.txt .
 
 RUN pip install -r requirements.txt

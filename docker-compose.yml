@@ -6,9 +6,10 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ${PATH_ROOT_COMPLETED_FILES}:${PATH_DOCKER_COMPLETED_FILES}
       - ${PATH_ROOT}:${PATH_DOCKER}
+      - ${PATH_PROJECT}:${PATH_PROJECT_DOCKER}
       - ${PATH_DOCUMENTS}:${PATH_DOCKER_DOCUMENTS}
+      - ${PATH_ROOT_COMPLETED_FILES}:${PATH_DOCKER_COMPLETED_FILES}
     environment:
       PATH_ROOT_COMPLETED_FILES: ${PATH_DOCKER_COMPLETED_FILES}
       PATH_ROOT: ${PATH_DOCKER}
@@ -17,4 +18,4 @@ services:
       context: ./
       dockerfile: ./Dockerfile
     command:
-      bash -c "python3 main.py"
+      bash -c "python3 ${PATH_PROJECT_DOCKER}/main.py"

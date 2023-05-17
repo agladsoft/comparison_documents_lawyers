@@ -9,8 +9,12 @@
     <title>File Dropper</title>
 </head>
 <body>
-    <label for="countError"> Количество ошибок в абзаце</label>
-    <input class="number form-field" type="number" id="countError" />
+<div style="margin-left: 5%">
+    <label class="textarea_style" for="countError"> Возможное количество ошибок в абзаце</label>
+    <input value="0" class="number form-field" type="number" id="countError" />
+
+    <label class="textarea_style" for="threshold"> Интенсивность разбивки</label>
+    <input value="200" class="number form-field" type="number" id="threshold" />
     <div class="parent">
         <div class="column">
             <form
@@ -37,9 +41,11 @@
             <textarea id="pdf" class="textarea_style" name="pdf" rows="25" cols="86"></textarea>
         </div>
     </div>
+    <div id="loader"></div>
+    <button id="unified" class="custom-btn btn-13" type="submit">УНИФИЦИРОВАТЬ</button>
 
-    <button id="downloadReport" class="custom-btn btn-13" type="submit">DOWNLOAD</button>
-
+    <button id="downloadReport" class="custom-btn btn-13" type="submit">СКАЧАТЬ</button>
+</div>
     <script type="application/javascript">
         Dropzone.options.dropper = {
             paramName: "file",
@@ -62,18 +68,40 @@
             }
         }
 
-        document.getElementById("downloadReport").onclick= async ()=> {
-            var countError = parseInt(document.getElementById('countError').value);
-            var docx = document.getElementById('docx').value
-            var pdf = document.getElementById('pdf').value
-            const dictFile = {"docx": docx, "pdf": pdf, "countError": countError ? countError : 0}
-            console.log(dictFile)
-            let fetchPromise = await fetch("http://10.23.4.205:8000/get_disagreement/", {
+        document.getElementById("unified").onclick= async ()=> {
+            var threshold = parseInt(document.getElementById('threshold').value);
+            var docx = document.getElementById('docx').value;
+            var pdf = document.getElementById('pdf').value;
+            const dictFile = {"docx": docx, "pdf": pdf, "threshold": threshold};
+            document.getElementById("loader").style.display = "block";
+            let fetchPromise = await fetch("http://10.23.4.205:5000/unified/", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(dictFile),
                     mode: 'cors'
                 });
+            document.getElementById("loader").style.display = "none";
+            console.log(fetchPromise);
+            const response = await fetchPromise.json();
+            console.log(response);
+            $("textarea#docx").val(response['docx']);
+            $("textarea#pdf").val(response['pdf']);
+        };
+
+        document.getElementById("downloadReport").onclick= async ()=> {
+            var countError = parseInt(document.getElementById('countError').value);
+            var docx = document.getElementById('docx').value
+            var pdf = document.getElementById('pdf').value
+            const dictFile = {"docx": docx, "pdf": pdf, "countError": countError}
+            console.log(dictFile)
+            document.getElementById("loader").style.display = "block";
+            let fetchPromise = await fetch("http://10.23.4.205:5000/get_disagreement/", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dictFile),
+                    mode: 'cors'
+                });
+            document.getElementById("loader").style.display = "none";
             console.log(fetchPromise)
             const blob = await fetchPromise.blob();
             const newBlob = new Blob([blob]);
