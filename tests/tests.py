@@ -1,4 +1,4 @@
-from docx import Docx
+from docx_ import Docx
 
 
 def test_paragraph():

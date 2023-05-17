@@ -4,15 +4,14 @@ import shutil
 import PyPDF2
 import enchant
 import contextlib
-
+from docx_ import Docx
 from __init__ import *
 from pathlib import Path
-
 from typing import TextIO, Union
 from werkzeug.datastructures import FileStorage
 from difference_between_files.difference import save_disagreement
 from flask import render_template, request, make_response, jsonify, Response
-from docx import Docx
+from unified.paragraph import paragraph_factory, chapters_by_token_factory, MatchedChapter, ChapterSide, logger
 
 
 class PDF(object):
