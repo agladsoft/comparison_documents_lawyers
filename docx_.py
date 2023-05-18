@@ -81,4 +81,3 @@ class Docx(object):
         with open(f"{os.path.dirname(self.absolute_path_filename)}/list_docx_text.txt", "w") as f:
             f.writelines(list_docx_text)
         return self.format_paragraphs(list_docx_text, list_pdf_text)
-
