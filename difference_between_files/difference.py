@@ -213,9 +213,6 @@ def save_disagreement(file1: str, file2: str, count_error: int, flag: bool = Fal
 
 
 
-
-
-
     file_stream = io.BytesIO()
     result.save(file_stream)
     file_stream.seek(0)
