@@ -113,6 +113,10 @@ input:focus, textarea:focus {
 	outline: none;
   	border: 2px solid #0000CD;
 }
+.margin_div {
+    margin-top: 0.5%;
+    margin-bottom: 0.5%;
+}
 
 
 /* Center the loader */
