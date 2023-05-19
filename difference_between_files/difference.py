@@ -133,9 +133,9 @@ def save_disagreement(file1: str, file2: str, count_error: int, flag: bool, file
     heading_cells = table.rows[0].cells
     heading_cells[0].text = "№"
     heading_cells[0].width = Inches(0.6)
-    heading_cells[1].text = f"Редакция заказчика {file_name_docx}"
+    heading_cells[1].text = f"Редакция заказчика\n{file_name_docx}"
     heading_cells[1].width = Inches(3)
-    heading_cells[2].text = f"Редакция исполнителя {file_name_pdf}"
+    heading_cells[2].text = f"Редакция исполнителя\n{file_name_pdf}"
     heading_cells[2].width = Inches(3)
 
     list1, list2 = list_from_string(file1), list_from_string(file2)
