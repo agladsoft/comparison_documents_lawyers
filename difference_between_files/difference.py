@@ -122,7 +122,7 @@ def flagg_append(flag_text,text1,text2,number,diff):
 
 
 
-def save_disagreement(file1: str, file2: str, count_error: int, flag: bool = False) -> io.BytesIO:
+def save_disagreement(file1: str, file2: str, count_error: int, flag: bool) -> io.BytesIO:
     logger.info('Create document')
     result = Document()
     result.add_heading("Протокол разногласий")

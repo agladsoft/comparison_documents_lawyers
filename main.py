@@ -142,7 +142,7 @@ def upload_docx() -> str:
 @app.post("/get_disagreement/")
 def get_disagreement():
     response = request.json
-    return save_disagreement(response["docx"], response["pdf"], response["countError"])
+    return save_disagreement(response["docx"], response["pdf"], response["countError"], response["group_paragraph"])
 
 
 @app.post("/unified/")

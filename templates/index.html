@@ -15,6 +15,12 @@
 
     <label class="textarea_style" for="threshold"> Интенсивность разбивки</label>
     <input value="200" class="number form-field" type="number" id="threshold" />
+
+     <div style="margin-top: 0.5%; margin-bottom: 0.5%">
+         <input type="checkbox" id="group_paragraph" checked="checked">
+         <label for="group_paragraph">Групировка по пункту или выводить пункт целиком</label>
+     </div>
+
     <div class="parent">
         <div class="column">
             <form
@@ -92,7 +98,8 @@
             var countError = parseInt(document.getElementById('countError').value);
             var docx = document.getElementById('docx').value
             var pdf = document.getElementById('pdf').value
-            const dictFile = {"docx": docx, "pdf": pdf, "countError": countError}
+            var group_paragraph = $("#group_paragraph").is(":checked") ? true : false;
+            const dictFile = {"docx": docx, "pdf": pdf, "countError": countError, "group_paragraph": group_paragraph}
             console.log(dictFile)
             document.getElementById("loader").style.display = "block";
             let fetchPromise = await fetch("http://10.23.4.205:5000/get_disagreement/", {
