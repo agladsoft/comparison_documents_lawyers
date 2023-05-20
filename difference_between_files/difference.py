@@ -98,8 +98,9 @@ def sequence_matcher(table,text1,text2,count_error,number):
                 left_diff_count += i2 - i1
                 right_diff_count += j2 - j1
 
-    if left_diff_count <= count_error and right_diff_count <= count_error:
+    if left_diff_count <= count_error and right_diff_count <= count_error and count_error>0:
         table._tbl.remove(table.rows[-1]._tr)
+
 
 
 def add_paragraph(table,text1,text2,number):
@@ -164,21 +165,21 @@ def save_disagreement(file1: str, file2: str, count_error: int, flag: bool, file
             else:
                 if len(flag_text[1])>1 :
                     if  any([i for i in flag_text[3]]):
-                        sequence_matcher(table, ''.join(flag_text[1]), ''.join(flag_text[2]), count_error, flag_text[0])
+                        sequence_matcher(table, '\n'.join(flag_text[1]), '\n'.join(flag_text[2]), count_error, flag_text[0])
                         flag_text = [0, [], [],[]]
                         flagg_append(flag_text, text1, text2, number, diff)
                     else:
-                        add_paragraph(table,''.join(flag_text[1]),''.join(flag_text[2]),flag_text[0])
+                        add_paragraph(table,'\n'.join(flag_text[1]),'\n'.join(flag_text[2]),flag_text[0])
                         flag_text = [0, [], [], []]
                         flagg_append(flag_text, text1, text2, number, diff)
                 else:
                     if len(flag_text[1])==1 and not flag_text[3][0]:
-                        add_paragraph(table, ''.join(flag_text[1]), ''.join(flag_text[2]), flag_text[0])
+                        add_paragraph(table, '\n'.join(flag_text[1]), '\n'.join(flag_text[2]), flag_text[0])
                         flag_text = [0, [], [],[]]
                         flagg_append(flag_text, text1, text2, number, diff)
                     else:
                         if len(flag_text[1]) == 1 and flag_text[3][0]:
-                            sequence_matcher(table, ''.join(flag_text[1]), ''.join(flag_text[2]), count_error,
+                            sequence_matcher(table, '\n'.join(flag_text[1]), '\n'.join(flag_text[2]), count_error,
                                              flag_text[0])
                             flag_text = [0, [], [], []]
                             flagg_append(flag_text, text1, text2, number, diff)
@@ -200,7 +201,7 @@ def save_disagreement(file1: str, file2: str, count_error: int, flag: bool, file
                         flag_text = [0, [], [], []]
                         continue
                     else:
-                        sequence_matcher(table,''.join(flag_text[1]),''.join(flag_text[2]),count_error,flag_text[0])
+                        sequence_matcher(table,'\n'.join(flag_text[1]),'\n'.join(flag_text[2]),count_error,flag_text[0])
                         flag_text = [0, [], [],[]]
                         flagg_append(flag_text, text1, text2, number, diff)
                 else:
@@ -211,6 +212,12 @@ def save_disagreement(file1: str, file2: str, count_error: int, flag: bool, file
                     else:
                         flag_text = [0, [], [], []]
                         flagg_append(flag_text, text1, text2, number, diff)
+
+
+    else:
+        if len(flag_text[1])>0:
+            sequence_matcher(table, '\n'.join(flag_text[1]), '\n'.join(flag_text[2]), count_error, flag_text[0])
+
 
 
 
