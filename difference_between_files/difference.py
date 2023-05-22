@@ -95,8 +95,8 @@ def sequence_matcher(table,text1,text2,count_error,number):
             ) not in replacements:
                 run1.font.highlight_color = WD_COLOR_INDEX.YELLOW
                 run2.font.highlight_color = WD_COLOR_INDEX.YELLOW
-                # left_diff_count += i2 - i1
-                # right_diff_count += j2 - j1
+                left_diff_count += i2 - i1
+                right_diff_count += j2 - j1
 
     if left_diff_count <= count_error and right_diff_count <= count_error and count_error>0:
         table._tbl.remove(table.rows[-1]._tr)
