@@ -34,14 +34,14 @@ def upload_docx() -> str:
     return docx.get_text()
 
 
-@app.post("/get_disagreement")
+@app.post("/get_disagreement/")
 def get_disagreement():
     response = request.json
     return save_disagreement(response["docx"], response["pdf"], response["countError"], response["group_paragraph"],
                              response["file_name_docx"], response["file_name_pdf"])
 
 
-@app.post("/unified")
+@app.post("/unified/")
 def get_unified_data():
     response = request.json
     max_thr = response["threshold"]
