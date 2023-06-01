@@ -10,11 +10,22 @@
 </head>
 <body>
 <div style="margin-left: 5%">
-    <label class="textarea_style" for="countError"> Возможное количество ошибок в абзаце</label>
-    <input value="0" class="number form-field" type="number" id="countError" />
 
-    <label class="textarea_style" for="threshold"> Интенсивность разбивки</label>
-    <input value="200" class="number form-field" type="number" id="threshold" />
+    <div class="margin_div">
+        <label class="textarea_style" for="countError"> Возможное количество ошибок в абзаце</label>
+        <input value="0" class="number form-field" type="number" id="countError" />
+    </div>
+
+    <div class="margin_div">
+        <label class="textarea_style" for="threshold"> Интенсивность разбивки</label>
+        <input value="200" class="number form-field" type="number" id="threshold" />
+    </div>
+
+    <div class="margin_div">
+        <label class="textarea_style" for="group_paragraph">Выводить весь пункт</label>
+        <input type="checkbox" id="group_paragraph" checked="checked">
+    </div>
+
     <div class="parent">
         <div class="column">
             <form
@@ -42,7 +53,7 @@
         </div>
     </div>
     <div id="loader"></div>
-    <button id="unified" class="custom-btn btn-13" type="submit">УНИФИЦИРОВАТЬ</button>
+    <button id="unified" class="custom-btn btn-13" type="submit">СОПОСТАВИТЬ ПО ПУНКТАМ</button>
 
     <button id="downloadReport" class="custom-btn btn-13" type="submit">СКАЧАТЬ</button>
 </div>
@@ -57,7 +68,7 @@
             success: function(file, response){
                 console.log(response);
                 $("textarea#pdf").val(response['text']);
-
+                document.getElementsByClassName("dz-filename")[1].getElementsByTagName('span')[0].innerHTML = "Отредактированный файл.pdf"
             }
         }
 
@@ -65,6 +76,7 @@
             success: function(file, response){
                 console.log(response);
                 $("textarea#docx").val(response);
+                document.getElementsByClassName("dz-filename")[0].getElementsByTagName('span')[0].innerHTML = "Исходный файл.docx"
             }
         }
 
@@ -92,7 +104,17 @@
             var countError = parseInt(document.getElementById('countError').value);
             var docx = document.getElementById('docx').value
             var pdf = document.getElementById('pdf').value
-            const dictFile = {"docx": docx, "pdf": pdf, "countError": countError}
+            var group_paragraph = $("#group_paragraph").is(":checked") ? true : false;
+            var fileNameDocx = document.getElementsByClassName("dz-filename")[0].getElementsByTagName('span')[0].innerText
+            var fileNamePdf = document.getElementsByClassName("dz-filename")[1].getElementsByTagName('span')[0].innerText
+            const dictFile = {
+                "docx": docx,
+                "pdf": pdf,
+                "countError": countError,
+                "group_paragraph": group_paragraph,
+                "file_name_docx": fileNameDocx,
+                "file_name_pdf": fileNamePdf
+            }
             console.log(dictFile)
             document.getElementById("loader").style.display = "block";
             let fetchPromise = await fetch("http://10.23.4.205:5000/get_disagreement/", {

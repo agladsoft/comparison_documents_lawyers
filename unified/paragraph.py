@@ -45,7 +45,7 @@ class Paragraph(object):
         self.symbols_count = len(self.symbols)
         self.global_position = position
         self.token_borders = self._get_cleaned_token_borders()
-        self.tokens, self.token_start_end = self._get_tokens(3)
+        self.tokens, self.token_start_end = self._get_tokens(2)
         self.tokens_count = len(self.tokens)
         self.prev = nbrs[0]
         self.next = nbrs[1]
@@ -277,14 +277,6 @@ class BorderMatch(object):
     def __lt__(self, other):
         return self.border_rate < other.border_rate
 
-    def _get_tokens_rate(self):
-        if self.best_bstart_right_token:
-            tokens_rate = min(self.best_bstart_right_token.rate,
-                              self.best_bend_right_token.rate)
-        else:
-            tokens_rate = 0.1
-        return tokens_rate
-
     @staticmethod
     def _get_mse_of_found_right_tokens(bs: FoundRightToken, be: FoundRightToken):
         y_true = [100, 100]  # Y_true = Y (original values)
@@ -329,6 +321,65 @@ class BorderMatchByToken(BorderMatch):
                 best_bs, best_be, best_mse, best_char_distance,  = bs, be, mse, char_distance
         a = 1
         return best_bs, best_be, best_mse, best_char_distance
+
+
+class BorderMatchByBestBorderEndToken(BorderMatchByToken):
+
+    @staticmethod
+    def _get_mse_of_found_right_tokens(bs: FoundRightToken, be: FoundRightToken):
+        # bs_error = 100 - bs.rate
+        be_error = 100 - be.rate
+        # mse = min(bs_error, be_error)
+        return be_error
+
+    def _get_best_found_bend_bstart_tokens_and_best_char_distance(self):
+        best_bs = None
+        best_be = None
+        best_mse = 99999999
+        best_char_distance = 99999999
+        for bs, be in itt.product(self.bstart_token_match.found_right_tokens,
+                                  self.bend_token_match.found_right_tokens):
+            char_distance = 0
+            mse = self._get_mse_of_found_right_tokens(bs, be)
+
+            if mse < best_mse:
+                best_bs, best_be, best_mse, best_char_distance,  = bs, be, mse, char_distance
+        a = 1
+        return best_bs, best_be, best_mse, best_char_distance
+
+
+
+
+class BorderMatchByBestBorderStartToken(BorderMatchByToken):
+
+    @staticmethod
+    def _get_mse_of_found_right_tokens(bs: FoundRightToken, be: FoundRightToken):
+        bs_error = 100 - bs.rate
+        # be_error = 100 - be.rate
+        # mse = min(bs_error, be_error)
+        return bs_error
+
+    def _get_best_found_bend_bstart_tokens_and_best_char_distance(self):
+        best_bs = None
+        best_be = None
+        best_mse = 99999999
+        best_char_distance = 99999999
+        for bs, be in itt.product(self.bstart_token_match.found_right_tokens,
+                                  self.bend_token_match.found_right_tokens):
+            char_distance = 0
+            mse = self._get_mse_of_found_right_tokens(bs, be)
+
+            if mse < best_mse:
+                best_bs, best_be, best_mse, best_char_distance,  = bs, be, mse, char_distance
+        a = 1
+        nbr_be_paragraph_id = len(best_bs.text) + best_bs.paragraph_id
+        nbr_be_text = self.right_bend_tokens[nbr_be_paragraph_id]
+        enforced_best_be = FoundRightToken(text=nbr_be_text,
+                                           rate=100,
+                                           paragraph_id=nbr_be_paragraph_id,
+                                           relative_pos=None)
+        return best_bs, enforced_best_be, best_mse, best_char_distance
+
 
 
 class MatchedChapter(object):
@@ -424,14 +475,14 @@ class MatchedChapter(object):
 
 
 class MatchedChapterByToken(MatchedChapter):
-    # def __init__.py(self, left_chapter: ChapterSide, right_chapter: ChapterSide, nbrs: tuple = (None, None),
+    # def __init__(self, left_chapter: ChapterSide, right_chapter: ChapterSide, nbrs: tuple = (None, None),
     #              born_border_match: float = None):
     #     # combined_text = ' '.join([p.symbols for p in right_chapter.paragraphs.values()])
     #     # paragraph = Paragraph(symbols=combined_text, position=[right_chapter.start_id], nbrs=(None, None))
     #     # right_chapter = ChapterSide(paragraphs={right_chapter.start_id: paragraph},
     #     #                             start_id=right_chapter.start_id,
     #     #                             end_id=right_chapter.start_id)
-    #     super().__init__.py(left_chapter, right_chapter, nbrs, born_border_match)
+    #     super().__init__(left_chapter, right_chapter, nbrs, born_border_match)
 
     def _get_right_tokens(self):
         """
@@ -492,6 +543,49 @@ class MatchedChapterByToken(MatchedChapter):
         assert "spawn is not possible"
 
 
+class MatchedChapterByBestBorderEndToken(MatchedChapterByToken):
+
+    def _fill_border_matches_heap(self):
+        border_matches_heap = []
+        left_p = self.left_chapter.paragraphs[self.left_chapter.start_id]
+        while left_p.global_position < self.left_chapter.end_id:
+            try:
+                border_match = BorderMatchByBestBorderEndToken(left_bstart_token=left_p.tokens[-1],
+                                                               left_bend_token=left_p.next.tokens[0],
+                                                               left_border_pid=left_p.next.global_position,
+                                                               right_bstart_tokens=self.right_bstart_tokens,
+                                                               right_bend_tokens=self.right_bend_tokens,
+                                                               right_chapter=self.right_chapter
+                                                               )
+                heapq.heappush(border_matches_heap, border_match)
+            except Exception as e:
+                print(f"Error: {e}")
+            left_p = left_p.next
+        return border_matches_heap
+
+
+
+class MatchedChapterByBestBorderStartToken(MatchedChapterByToken):
+
+    def _fill_border_matches_heap(self):
+        border_matches_heap = []
+        left_p = self.left_chapter.paragraphs[self.left_chapter.start_id]
+        while left_p.global_position < self.left_chapter.end_id:
+            try:
+                border_match = BorderMatchByBestBorderStartToken(left_bstart_token=left_p.tokens[-1],
+                                                                 left_bend_token=left_p.next.tokens[0],
+                                                                 left_border_pid=left_p.next.global_position,
+                                                                 right_bstart_tokens=self.right_bstart_tokens,
+                                                                 right_bend_tokens=self.right_bend_tokens,
+                                                                 right_chapter=self.right_chapter
+                                                                 )
+                heapq.heappush(border_matches_heap, border_match)
+            except Exception as e:
+                print(f"Error: {e}")
+            left_p = left_p.next
+        return border_matches_heap
+
+
 
 
 def chapters_by_token_factory(head_chapter):
@@ -513,3 +607,44 @@ def chapters_by_token_factory(head_chapter):
 
     return head_chapter_bt
 
+
+
+def chapters_by_best_be_token_factory(head_chapter):
+    prev_chapter_best_bt = None
+    current_chapter = head_chapter
+
+    while current_chapter:
+        current_chapter_best_bt = MatchedChapterByBestBorderEndToken(
+            left_chapter=current_chapter.left_chapter,
+            right_chapter=current_chapter.right_chapter,
+            nbrs=(prev_chapter_best_bt, None)
+        )
+        if prev_chapter_best_bt is None:
+            head_chapter_bt = current_chapter_best_bt
+        else:
+            prev_chapter_best_bt.next = current_chapter_best_bt
+        prev_chapter_best_bt = current_chapter_best_bt
+        current_chapter = current_chapter.next
+
+    return head_chapter_bt
+
+
+
+def chapters_by_best_bs_token_factory(head_chapter):
+    prev_chapter_best_bt = None
+    current_chapter = head_chapter
+
+    while current_chapter:
+        current_chapter_best_bt = MatchedChapterByBestBorderStartToken(
+            left_chapter=current_chapter.left_chapter,
+            right_chapter=current_chapter.right_chapter,
+            nbrs=(prev_chapter_best_bt, None)
+        )
+        if prev_chapter_best_bt is None:
+            head_chapter_bt = current_chapter_best_bt
+        else:
+            prev_chapter_best_bt.next = current_chapter_best_bt
+        prev_chapter_best_bt = current_chapter_best_bt
+        current_chapter = current_chapter.next
+
+    return head_chapter_bt

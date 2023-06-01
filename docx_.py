@@ -1,15 +1,12 @@
-from typing import List
-
 import os
-import subprocess
-from collections import deque
 import re
-
+import subprocess
 import fuzzywuzzy
-from fuzzywuzzy import process
-
-from docx2python import docx2python
 import pdfplumber
+from typing import List
+from collections import deque
+from fuzzywuzzy import process
+from docx2python import docx2python
 
 
 class Docx(object):
