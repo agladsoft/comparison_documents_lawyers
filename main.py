@@ -15,7 +15,7 @@ def index() -> str:
 @app.post("/upload")
 def upload_docx() -> Union[Response, str]:
     file = request.files['file']
-    page_header = "true"
+    page_header = request.headers.environ["HTTP_PAGE_HEADER"] == "true"
     absolute_path_filename = f"{dir_name_docx}/{file.filename}"
     mime_type = mimetypes.guess_type(absolute_path_filename, strict=True)[0]
     if mime_type == "application/pdf":
