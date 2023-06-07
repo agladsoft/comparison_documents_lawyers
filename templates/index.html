@@ -101,10 +101,8 @@
             }
         }
 
-        function isObject(value) {
-          return (
-            typeof value === 'object' && value !== null && !Array.isArray(value)
-          );
+        function isObject (n) {
+          return Object.prototype.toString.call(n) === '[object Object]';
         }
 
         document.getElementById("unified").onclick= async ()=> {
