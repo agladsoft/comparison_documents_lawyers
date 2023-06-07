@@ -78,7 +78,7 @@
             success: function(file, response){
                 console.log(response);
                 if (isObject(response)) {
-                    $("textarea#pdf").val(response["text]);
+                    $("textarea#pdf").val(response["text"]);
                 } else {
                     $("textarea#pdf").val(response);
                 }
