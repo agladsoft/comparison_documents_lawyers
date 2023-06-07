@@ -1,3 +1,4 @@
+import mimetypes
 from pdf_ import PDF
 from docx_ import Docx
 from __init__ import *
@@ -11,27 +12,25 @@ from difference_between_files.difference import save_disagreement
 def index() -> str:
     return render_template("index.html")
 
-
 @app.post("/upload")
-def upload_chunk() -> Union[Response, str]:
+def upload_docx() -> Union[Response, str]:
     file = request.files['file']
-    logger.info(f"Filename is {file.filename}")
-    absolute_path_filename = f"{dir_name_pdf}/{file.filename}"
-    pdf = PDF(file, absolute_path_filename)
-    pdf.join_chunks_in_file()
-    if request.content_length < 250800:
-        logger.info(f"Content length is {request.content_length}")
-        return pdf.main()
-    return absolute_path_filename
-
-
-@app.post("/upload_docx")
-def upload_docx() -> str:
-    file = request.files['file']
-    absolute_path_filename = f"{dir_name_docx}/docx.docx"
+    page_header = request.headers.environ["HTTP_PAGE_HEADER"] == "true"
+    absolute_path_filename = f"{dir_name_docx}/{file.filename}"
     file.save(absolute_path_filename)
-    docx = Docx(absolute_path_filename)
-    return docx.get_text()
+    mime_type = mimetypes.guess_type(absolute_path_filename, strict=True)[0]
+    if mime_type == "application/pdf":
+        absolute_path_filename = f"{dir_name_pdf}/{file.filename}"
+        file.save(absolute_path_filename)
+        pdf = PDF(file, absolute_path_filename)
+        pdf.join_chunks_in_file()
+        if request.content_length < 250800:
+            logger.info(f"Content length is {request.content_length}")
+            return pdf.main()
+        return absolute_path_filename
+    else:
+        docx = Docx(absolute_path_filename)
+        return docx.get_text(mime_type, page_header)
 
 
 @app.post("/get_disagreement/")

@@ -1,9 +1,10 @@
-import os
 import re
 import subprocess
 import fuzzywuzzy
 import pdfplumber
+from __init__ import *
 from typing import List
+from docx import Document
 from collections import deque
 from fuzzywuzzy import process
 from docx2python import docx2python
@@ -64,7 +65,22 @@ class Docx(object):
         self.save_txt(paragraphs)
         return "".join(paragraphs)
 
-    def get_text(self) -> str:
+    def refactor_page_header(self, flag) -> None:
+        if flag:
+            doc = Document(self.absolute_path_filename)
+            doc.sections[0].header.paragraphs[0].text = ''
+            doc.sections[0].footer.paragraphs[0].text = ''
+            doc.save(self.absolute_path_filename)
+
+    def convert_to_docx(self) -> None:
+        subprocess.check_output(['libreoffice', '--convert-to', 'docx', self.absolute_path_filename, '--outdir',
+                                 os.path.dirname(self.absolute_path_filename)])
+        self.absolute_path_filename += 'x'
+
+    def get_text(self, mime_type, page_header) -> str:
+        if mime_type == "application/msword":
+            self.convert_to_docx()
+        self.refactor_page_header(page_header)
         docx_text = docx2python(self.absolute_path_filename)
         subprocess.check_output(['libreoffice', '--convert-to', 'pdf', self.absolute_path_filename, '--outdir',
                                  os.path.dirname(self.absolute_path_filename)])

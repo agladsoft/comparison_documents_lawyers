@@ -26,11 +26,16 @@
         <input type="checkbox" id="group_paragraph" checked="checked">
     </div>
 
+    <div class="margin_div">
+        <label class="textarea_style" for="page_header">Колонтитул</label>
+        <input type="checkbox" id="page_header">
+    </div>
+
     <div class="parent">
         <div class="column">
             <form
                 method="POST"
-                action="/upload_docx"
+                action="/upload"
                 class="dropzone dz-clickable"
                 id="docxForm"
                 enctype="multipart/form-data"
@@ -64,15 +69,23 @@
             forceChunking: true,
             url: "/upload",
             maxFilesize: 1025, // megabytes
-            chunkSize: 250000, // bytes
+            chunkSize: 250000, // bytes,
+            headers: {"page_header": $("#page_header").is(":checked") ? "true" : "false"},
             success: function(file, response){
                 console.log(response);
-                $("textarea#pdf").val(response['text']);
+                $("textarea#pdf").val(response);
                 document.getElementsByClassName("dz-filename")[1].getElementsByTagName('span')[0].innerHTML = "Отредактированный файл.pdf"
             }
         }
 
         Dropzone.options.docxForm = {
+            paramName: "file",
+            chunking: true,
+            forceChunking: true,
+            url: "/upload",
+            maxFilesize: 1025, // megabytes
+            chunkSize: 250000, //
+            headers: {"page_header": $("#page_header").is(":checked") ? "true" : "false"},
             success: function(file, response){
                 console.log(response);
                 $("textarea#docx").val(response);
