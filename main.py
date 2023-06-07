@@ -21,7 +21,6 @@ def upload_docx() -> Union[Response, str]:
     mime_type = mimetypes.guess_type(absolute_path_filename, strict=True)[0]
     if mime_type == "application/pdf":
         absolute_path_filename = f"{dir_name_pdf}/{file.filename}"
-        file.save(absolute_path_filename)
         pdf = PDF(file, absolute_path_filename)
         pdf.join_chunks_in_file()
         if request.content_length < 250800:
