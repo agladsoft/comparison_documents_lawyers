@@ -63,6 +63,10 @@
     <button id="downloadReport" class="custom-btn btn-13" type="submit">СКАЧАТЬ</button>
 </div>
     <script type="application/javascript">
+        function isObject (n) {
+          return Object.prototype.toString.call(n) === '[object Object]';
+        }
+
         Dropzone.options.dropper = {
             paramName: "file",
             chunking: true,
@@ -73,12 +77,11 @@
             headers: {"page_header": $("#page_header").is(":checked") ? "true" : "false"},
             success: function(file, response){
                 console.log(response);
-<!--                if (isObject(variable)) {-->
-<!--                    $("textarea#pdf").val(response["text]);-->
-<!--                } else {-->
-<!--                    $("textarea#pdf").val(response);-->
-<!--                }-->
-                $("textarea#pdf").val(response);
+                if (isObject(response)) {
+                    $("textarea#pdf").val(response["text]);
+                } else {
+                    $("textarea#pdf").val(response);
+                }
                 document.getElementsByClassName("dz-filename")[1].getElementsByTagName('span')[0].innerHTML = "Отредактированный файл.pdf"
             }
         }
@@ -93,18 +96,13 @@
             headers: {"page_header": $("#page_header").is(":checked") ? "true" : "false"},
             success: function(file, response){
                 console.log(response);
-<!--                if (isObject(variable)) {-->
-<!--                    $("textarea#docx").val(response["text"]);-->
-<!--                } else {-->
-<!--                    $("textarea#docx").val(response);-->
-<!--                }-->
-                $("textarea#docx").val(response)
+                if (isObject(response)) {
+                    $("textarea#docx").val(response["text"]);
+                } else {
+                    $("textarea#docx").val(response);
+                }
                 document.getElementsByClassName("dz-filename")[0].getElementsByTagName('span')[0].innerHTML = "Исходный файл.docx"
             }
-        }
-
-        function isObject (n) {
-          return Object.prototype.toString.call(n) === '[object Object]';
         }
 
         document.getElementById("unified").onclick= async ()=> {
