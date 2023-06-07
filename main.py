@@ -17,7 +17,6 @@ def upload_docx() -> Union[Response, str]:
     file = request.files['file']
     page_header = request.headers.environ["HTTP_PAGE_HEADER"] == "true"
     absolute_path_filename = f"{dir_name_docx}/{file.filename}"
-    file.save(absolute_path_filename)
     mime_type = mimetypes.guess_type(absolute_path_filename, strict=True)[0]
     if mime_type == "application/pdf":
         absolute_path_filename = f"{dir_name_pdf}/{file.filename}"
@@ -28,6 +27,7 @@ def upload_docx() -> Union[Response, str]:
             return pdf.main()
         return absolute_path_filename
     else:
+        file.save(absolute_path_filename)
         docx = Docx(absolute_path_filename)
         return docx.get_text(mime_type, page_header)
 
