@@ -1,4 +1,4 @@
-import mimetypes
+import magic
 from pdf_ import PDF
 from docx_ import Docx
 from __init__ import *
@@ -7,6 +7,7 @@ from unified.split_scanned_by_paragraph import *
 from flask import render_template, request, jsonify, Response
 from difference_between_files.difference import save_disagreement
 
+mime_type = None
 
 @app.get("/")
 def index() -> str:
@@ -14,11 +15,13 @@ def index() -> str:
 
 @app.post("/upload")
 def upload_docx() -> Union[Response, str]:
+    global mime_type
     file = request.files['file']
     page_header = request.headers.environ["HTTP_PAGE_HEADER"] == "true"
-    absolute_path_filename = f"{dir_name_docx}/{file.filename}"
-    mime_type = mimetypes.guess_type(absolute_path_filename, strict=True)[0]
-    if mime_type == "application/pdf":
+    file_for_define_mime = f"{os.environ.get('PATH_DOCUMENTS')}/{file.filename}"
+    if not mime_type:
+        mime_type = magic.Magic().from_buffer(file.stream.read())
+    if "PDF" in mime_type:
         absolute_path_filename = f"{dir_name_pdf}/{file.filename}"
         pdf = PDF(file, absolute_path_filename)
         pdf.join_chunks_in_file()
@@ -27,7 +30,8 @@ def upload_docx() -> Union[Response, str]:
             return pdf.main()
         return absolute_path_filename
     else:
-        file.save(absolute_path_filename)
+        file.save(file_for_define_mime)
+        absolute_path_filename = f"{dir_name_docx}/{file.filename}"
         docx = Docx(absolute_path_filename)
         return docx.get_text(mime_type, page_header)
 

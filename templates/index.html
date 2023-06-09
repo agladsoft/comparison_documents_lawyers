@@ -66,7 +66,7 @@
         function isObject (n) {
           return Object.prototype.toString.call(n) === '[object Object]';
         }
-
+        console.log(String($("#page_header").is(":checked")))
         Dropzone.options.dropper = {
             paramName: "file",
             chunking: true,
@@ -74,7 +74,7 @@
             url: "/upload",
             maxFilesize: 1025, // megabytes
             chunkSize: 250000, // bytes,
-            headers: {"page_header": $("#page_header").is(":checked") ? "true" : "false"},
+            headers: {"page_header": String($("#page_header").is(":checked"))},
             success: function(file, response){
                 console.log(response);
                 if (isObject(response)) {
@@ -93,7 +93,7 @@
             url: "/upload",
             maxFilesize: 1025, // megabytes
             chunkSize: 250000, //
-            headers: {"page_header": $("#page_header").is(":checked") ? "true" : "false"},
+            headers: {"page_header": String($("#page_header").is(":checked"))},
             success: function(file, response){
                 console.log(response);
                 if (isObject(response)) {
