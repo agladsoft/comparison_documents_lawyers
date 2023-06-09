@@ -26,25 +26,7 @@
         <input type="checkbox" id="group_paragraph" checked="checked">
     </div>
 
-    <div class="margin_div">
-        <label class="textarea_style" for="page_header">Колонтитул</label>
-        <input type="checkbox" id="page_header">
-    </div>
-
     <div class="parent">
-        <div class="column">
-            <form
-                method="POST"
-                action="/upload"
-                class="dropzone dz-clickable"
-                id="docxForm"
-                enctype="multipart/form-data"
-            >
-            </form>
-            <textarea id="docx" class="textarea_style" name="docx" rows="25" cols="86"></textarea>
-        </div>
-
-
         <div class="column">
             <form
                 method="POST"
@@ -56,6 +38,18 @@
             </form>
             <textarea id="pdf" class="textarea_style" name="pdf" rows="25" cols="86"></textarea>
         </div>
+
+        <div class="column">
+            <form
+                method="POST"
+                action="/upload"
+                class="dropzone dz-clickable"
+                id="docxForm"
+                enctype="multipart/form-data"
+            >
+            </form>
+            <textarea id="docx" class="textarea_style" name="docx" rows="25" cols="86"></textarea>
+        </div>
     </div>
     <div id="loader"></div>
     <button id="unified" class="custom-btn btn-13" type="submit">СОПОСТАВИТЬ ПО ПУНКТАМ</button>
@@ -66,25 +60,6 @@
         function isObject (n) {
           return Object.prototype.toString.call(n) === '[object Object]';
         }
-        console.log(String($("#page_header").is(":checked")))
-        Dropzone.options.dropper = {
-            paramName: "file",
-            chunking: true,
-            forceChunking: true,
-            url: "/upload",
-            maxFilesize: 1025, // megabytes
-            chunkSize: 250000, // bytes,
-            headers: {"page_header": String($("#page_header").is(":checked"))},
-            success: function(file, response){
-                console.log(response);
-                if (isObject(response)) {
-                    $("textarea#pdf").val(response["text"]);
-                } else {
-                    $("textarea#pdf").val(response);
-                }
-                document.getElementsByClassName("dz-filename")[1].getElementsByTagName('span')[0].innerHTML = "Отредактированный файл.pdf"
-            }
-        }
 
         Dropzone.options.docxForm = {
             paramName: "file",
@@ -92,8 +67,9 @@
             forceChunking: true,
             url: "/upload",
             maxFilesize: 1025, // megabytes
-            chunkSize: 250000, //
-            headers: {"page_header": String($("#page_header").is(":checked"))},
+            chunkSize: 250000, // bytes
+            dictDefaultMessage: "Поместите сюда отредактированный файл с расширениями (doc, docx, pdf)",
+<!--            headers: {"page_header": String($("#page_header").is(":checked"))},-->
             success: function(file, response){
                 console.log(response);
                 if (isObject(response)) {
@@ -101,7 +77,27 @@
                 } else {
                     $("textarea#docx").val(response);
                 }
-                document.getElementsByClassName("dz-filename")[0].getElementsByTagName('span')[0].innerHTML = "Исходный файл.docx"
+                document.getElementsByClassName("dz-filename")[0].getElementsByTagName('span')[0].innerHTML = "Исходный файл"
+            }
+        }
+
+        Dropzone.options.dropper = {
+            paramName: "file",
+            chunking: true,
+            forceChunking: true,
+            url: "/upload",
+            maxFilesize: 1025, // megabytes
+            chunkSize: 250000, // bytes,
+            dictDefaultMessage: "Поместите сюда исходный файл с расширениями (doc, docx, pdf)",
+<!--            headers: {"page_header": String($("#page_header").is(":checked"))},-->
+            success: function(file, response){
+                console.log(response);
+                if (isObject(response)) {
+                    $("textarea#pdf").val(response["text"]);
+                } else {
+                    $("textarea#pdf").val(response);
+                }
+                document.getElementsByClassName("dz-filename")[1].getElementsByTagName('span')[0].innerHTML = "Отредактированный файл"
             }
         }
 
