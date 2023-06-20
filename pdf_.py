@@ -4,6 +4,9 @@ import shutil
 import PyPDF2
 import enchant
 import contextlib
+
+import pikepdf
+
 from __init__ import *
 from pathlib import Path
 from typing import TextIO
@@ -67,22 +70,6 @@ class PDF(object):
         logger.info(f"type {type(dict_new_file)}")
         return jsonify(dict_new_file)
 
-    def join_chunks_in_file(self) -> Response:
-        current_chunk = int(request.form['dzchunkindex'])
-        if os.path.exists(self.absolute_path_filename) and current_chunk == 0:
-            return make_response(('File already exists', 400))
-        try:
-            with open(self.absolute_path_filename, 'ab') as f:
-                f.seek(int(request.form['dzchunkbyteoffset']))
-                f.write(self.file.stream.read())
-        except OSError:
-            return make_response(("Not sure why,"
-                                  " but we couldn't write the file to disk", 500))
-        total_chunks = int(request.form['dztotalchunkcount'])
-        if current_chunk + 1 == total_chunks and os.path.getsize(self.absolute_path_filename) != \
-                int(request.form['dztotalfilesize']):
-            return make_response(('Size mismatch', 500))
-
     def get_files(self, file: str, directory: str, total_pages: int, path_root_completed_files: str) -> TextIO:
         infinite_loop = True
         filenames = []
@@ -101,9 +88,9 @@ class PDF(object):
     def main(self) -> Response:
         path_root = os.environ.get('PATH_ROOT')
         path_root_completed_files = os.environ.get('PATH_ROOT_COMPLETED_FILES')
-        pdf_file = PyPDF2.PdfFileReader(open(self.absolute_path_filename, 'rb'))
+        pdf_file = pikepdf.Pdf.open(self.absolute_path_filename)
         if not Path(f"{path_root}/{self.file.filename}").is_file():
             shutil.move(self.absolute_path_filename, path_root)
         new_file = self.get_files(os.path.basename(self.absolute_path_filename).replace(".pdf", ""), f"{path_root}/txt",
-                                  pdf_file.numPages, path_root_completed_files)
+                                  pdf_file.Root.Pages.Count, path_root_completed_files)
         return self.return_text_from_pdf(self.remove_empty_lines(new_file.name))
