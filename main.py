@@ -25,11 +25,14 @@ def upload_docx() -> Union[Response, str]:
             logger.info(f"Content length is {request.content_length}")
             return pdf.main()
         return absolute_path_filename
-    else:
+    elif "Microsoft Word" in mime_type or "Composite Document File V2 Document" in mime_type:
         absolute_path_filename = f"{dir_name_docx}/{file.filename}"
         file.save(absolute_path_filename)
         docx = Docx(absolute_path_filename)
         return docx.get_text(mime_type)
+    else:
+        return f"Ваш mime type - {mime_type}. Мы ожидаем на входе такие mime types: PDF, " \
+               f"Microsoft Word и Composite Document File V2 Document. Попробуйте пересохранить файл в нужный тип."
 
 
 @app.post("/get_disagreement/")
