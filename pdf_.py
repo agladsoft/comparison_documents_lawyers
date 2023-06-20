@@ -1,17 +1,14 @@
 import re
 import json
 import shutil
-import PyPDF2
+import pikepdf
 import enchant
 import contextlib
-
-import pikepdf
-
 from __init__ import *
 from pathlib import Path
 from typing import TextIO
+from flask import Response, jsonify
 from werkzeug.datastructures import FileStorage
-from flask import make_response, Response, jsonify, request
 
 
 class PDF(object):

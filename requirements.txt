@@ -19,3 +19,4 @@ rapidfuzz==2.13.2
 python-docx==0.8.11
 numpy==1.24.3
 python-magic==0.4.27
+pikepdf==7.2.0
