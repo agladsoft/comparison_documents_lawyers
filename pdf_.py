@@ -1,12 +1,13 @@
 import re
 import json
+import glob
 import shutil
 import pikepdf
 import enchant
 import contextlib
 from __init__ import *
 from pathlib import Path
-from typing import TextIO
+from typing import TextIO, Tuple
 from flask import Response, jsonify
 from werkzeug.datastructures import FileStorage
 
@@ -67,6 +68,18 @@ class PDF(object):
         logger.info(f"type {type(dict_new_file)}")
         return jsonify(dict_new_file)
 
+    def get_file_from_cache(self, path_root_completed_files: str) -> Tuple[bool, str]:
+        for root, dirs, files in os.walk(path_root_completed_files, topdown=False):
+                for name in files:
+                    if os.path.basename(self.absolute_path_filename).split(".")[0] + ".txt" == name:
+                        return True, os.path.join(root, name)
+
+    @staticmethod
+    def truncate(path: str) -> None:
+        files = glob.glob(f'{path}/*.*')
+        for f in files:
+            os.remove(f)
+
     def get_files(self, file: str, directory: str, total_pages: int, path_root_completed_files: str) -> TextIO:
         infinite_loop = True
         filenames = []
@@ -80,14 +93,19 @@ class PDF(object):
                                                key=lambda x: int(re.findall(r'\d{1,5}', re.split("[.]pdf", x)[1])[0]))
                         infinite_loop = len(filenames) != total_pages
         logger.info(f"All needed files {filenames}")
-        return self.concatenate_files(f"{path_root_completed_files}/{file}.txt", filenames)
+        target_file = self.concatenate_files(f"{path_root_completed_files}/{file}.txt", filenames)
+        self.truncate(directory)
+        return target_file
 
     def main(self) -> Response:
         path_root = os.environ.get('PATH_ROOT')
         path_root_completed_files = os.environ.get('PATH_ROOT_COMPLETED_FILES')
         pdf_file = pikepdf.Pdf.open(self.absolute_path_filename)
+        is_exist_file_in_cache, final_file= self.get_file_from_cache(path_root_completed_files)
+        if is_exist_file_in_cache:
+            return self.return_text_from_pdf(final_file)
         if not Path(f"{path_root}/{self.file.filename}").is_file():
             shutil.move(self.absolute_path_filename, path_root)
         new_file = self.get_files(os.path.basename(self.absolute_path_filename).replace(".pdf", ""), f"{path_root}/txt",
                                   pdf_file.Root.Pages.Count, path_root_completed_files)
-        return self.return_text_from_pdf(self.remove_empty_lines(new_file.name))
+        return self.return_text_from_pdf(new_file.name)
