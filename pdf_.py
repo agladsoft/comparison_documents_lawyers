@@ -1,14 +1,15 @@
 import re
 import json
+import glob
 import shutil
-import PyPDF2
+import pikepdf
 import enchant
 import contextlib
 from __init__ import *
 from pathlib import Path
-from typing import TextIO
+from typing import TextIO, Tuple
+from flask import Response, jsonify
 from werkzeug.datastructures import FileStorage
-from flask import make_response, Response, jsonify, request
 
 
 class PDF(object):
@@ -67,21 +68,18 @@ class PDF(object):
         logger.info(f"type {type(dict_new_file)}")
         return jsonify(dict_new_file)
 
-    def join_chunks_in_file(self) -> Response:
-        current_chunk = int(request.form['dzchunkindex'])
-        if os.path.exists(self.absolute_path_filename) and current_chunk == 0:
-            return make_response(('File already exists', 400))
-        try:
-            with open(self.absolute_path_filename, 'ab') as f:
-                f.seek(int(request.form['dzchunkbyteoffset']))
-                f.write(self.file.stream.read())
-        except OSError:
-            return make_response(("Not sure why,"
-                                  " but we couldn't write the file to disk", 500))
-        total_chunks = int(request.form['dztotalchunkcount'])
-        if current_chunk + 1 == total_chunks and os.path.getsize(self.absolute_path_filename) != \
-                int(request.form['dztotalfilesize']):
-            return make_response(('Size mismatch', 500))
+    def get_file_from_cache(self, path_root_completed_files: str) -> Tuple[bool, str]:
+        for root, dirs, files in os.walk(path_root_completed_files, topdown=False):
+                for name in files:
+                    if os.path.basename(self.absolute_path_filename).split(".")[0] + ".txt" == name:
+                        return True, os.path.join(root, name)
+        return False, path_root_completed_files
+
+    @staticmethod
+    def truncate(path: str) -> None:
+        files = glob.glob(f'{path}/*.*')
+        for f in files:
+            os.remove(f)
 
     def get_files(self, file: str, directory: str, total_pages: int, path_root_completed_files: str) -> TextIO:
         infinite_loop = True
@@ -96,14 +94,19 @@ class PDF(object):
                                                key=lambda x: int(re.findall(r'\d{1,5}', re.split("[.]pdf", x)[1])[0]))
                         infinite_loop = len(filenames) != total_pages
         logger.info(f"All needed files {filenames}")
-        return self.concatenate_files(f"{path_root_completed_files}/{file}.txt", filenames)
+        target_file = self.concatenate_files(f"{path_root_completed_files}/{file}.txt", filenames)
+        self.truncate(directory)
+        return target_file
 
     def main(self) -> Response:
         path_root = os.environ.get('PATH_ROOT')
         path_root_completed_files = os.environ.get('PATH_ROOT_COMPLETED_FILES')
-        pdf_file = PyPDF2.PdfFileReader(open(self.absolute_path_filename, 'rb'))
+        pdf_file = pikepdf.Pdf.open(self.absolute_path_filename)
+        is_exist_file_in_cache, final_file= self.get_file_from_cache(path_root_completed_files)
+        if is_exist_file_in_cache:
+            return self.return_text_from_pdf(final_file)
         if not Path(f"{path_root}/{self.file.filename}").is_file():
             shutil.move(self.absolute_path_filename, path_root)
         new_file = self.get_files(os.path.basename(self.absolute_path_filename).replace(".pdf", ""), f"{path_root}/txt",
-                                  pdf_file.numPages, path_root_completed_files)
-        return self.return_text_from_pdf(self.remove_empty_lines(new_file.name))
+                                  pdf_file.Root.Pages.Count, path_root_completed_files)
+        return self.return_text_from_pdf(new_file.name)
