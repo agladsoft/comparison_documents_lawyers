@@ -71,7 +71,7 @@ class PDF(object):
     def get_file_from_cache(self, path_root_completed_files: str) -> Tuple[bool, str]:
         for root, dirs, files in os.walk(path_root_completed_files, topdown=False):
                 for name in files:
-                    if os.path.basename(self.absolute_path_filename).split(".")[0] + ".txt" == name:
+                    if os.path.basename(self.absolute_path_filename).split(".pdf")[0] + ".txt" == name:
                         return True, os.path.join(root, name)
         return False, path_root_completed_files
 
