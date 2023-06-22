@@ -102,7 +102,7 @@ class PDF(object):
         path_root = os.environ.get('PATH_ROOT')
         path_root_completed_files = os.environ.get('PATH_ROOT_COMPLETED_FILES')
         pdf_file = pikepdf.Pdf.open(self.absolute_path_filename)
-        is_exist_file_in_cache, final_file= self.get_file_from_cache(path_root_completed_files)
+        is_exist_file_in_cache, final_file = self.get_file_from_cache(path_root_completed_files)
         if is_exist_file_in_cache:
             return self.return_text_from_pdf(final_file)
         if not Path(f"{path_root}/{self.file.filename}").is_file():
