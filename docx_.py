@@ -77,10 +77,10 @@ class Docx(object):
                                  os.path.dirname(self.absolute_path_filename)])
         self.absolute_path_filename += 'x'
 
-    def get_text(self, mime_type, page_header) -> str:
-        if mime_type == "application/msword":
+    def get_text(self, mime_type) -> str:
+        if "Composite Document File V2 Document" in mime_type:
             self.convert_to_docx()
-        self.refactor_page_header(page_header)
+        # self.refactor_page_header(True)
         docx_text = docx2python(self.absolute_path_filename)
         subprocess.check_output(['libreoffice', '--convert-to', 'pdf', self.absolute_path_filename, '--outdir',
                                  os.path.dirname(self.absolute_path_filename)])
