@@ -73,6 +73,7 @@ class PDF(object):
                 for name in files:
                     if os.path.basename(self.absolute_path_filename).split(".")[0] + ".txt" == name:
                         return True, os.path.join(root, name)
+        return False, path_root_completed_files
 
     @staticmethod
     def truncate(path: str) -> None:
