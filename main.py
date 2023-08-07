@@ -46,7 +46,7 @@ def upload() -> Union[Response, str]:
         if "PDF" in mime_type:
             pdf: PDF = PDF(file, absolute_path_filename)
             return pdf.main()
-        docx_types = ["Microsoft Word", "Composite Document File V2 Document"]
+        docx_types = ["Microsoft Word", "Composite Document File V2 Document", "Microsoft OOXML"]
         if any(docx_type in mime_type for docx_type in docx_types):
             docx: Docx = Docx(absolute_path_filename)
             return docx.get_text(mime_type)
