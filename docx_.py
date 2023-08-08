@@ -9,6 +9,8 @@ from collections import deque
 from fuzzywuzzy import process
 from docx2python import docx2python
 
+logging.getLogger("pdfminer").setLevel(logging.WARNING)
+
 
 class Docx(object):
     def __init__(self, absolute_path_filename: str):
