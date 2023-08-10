@@ -48,13 +48,9 @@ def upload() -> Union[Response, str]:
             return pdf.main()
         docx_types = ["Microsoft Word", "Composite Document File V2 Document", "Microsoft OOXML"]
         if any(docx_type in mime_type for docx_type in docx_types):
-            try:
-                docx: Docx = Docx(absolute_path_filename)
-                return docx.get_text(mime_type)
-            except Exception as ex:
-                print(ex)
-                return "Ошибка. Вы загрузили не поддерживаемый подтип файла или файл поврежден."
-        return "Ошибка. Вы загрузили не поддерживаемый подтип файла или файл поврежден."
+            docx: Docx = Docx(absolute_path_filename)
+            return docx.get_text(mime_type)
+        raise "Ошибка. Вы загрузили не поддерживаемый подтип файла или файл поврежден."
     return absolute_path_filename
 
 @app.post("/get_disagreement/")

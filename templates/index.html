@@ -56,7 +56,7 @@
 
     <button id="downloadReport" class="custom-btn btn-13" type="submit">СКАЧАТЬ</button>
 </div>
-    <script type="application/javascript">
+<script type="application/javascript">
         function isObject (n) {
           return Object.prototype.toString.call(n) === '[object Object]';
         }
@@ -69,15 +69,20 @@
             maxFilesize: 1025, // megabytes
             chunkSize: 250000, // bytes,
             dictDefaultMessage: "Поместите сюда исходный файл с расширениями (doc, docx, pdf)",
-<!--            headers: {"page_header": String($("#page_header").is(":checked"))},-->
             success: function(file, response){
-                console.log(response);
                 if (isObject(response)) {
                     $("textarea#docx").val(response["text"]);
                 } else {
                     $("textarea#docx").val(response);
                 }
                 document.getElementsByClassName("dz-filename")[0].getElementsByTagName('span')[0].innerHTML = "Исходный файл"
+            },
+            error: function(file, response) {
+                Swal.fire(
+                    'Ошибка!',
+                    'Вы загрузили не поддерживаемый подтип файла или файл поврежден!',
+                    'error'
+                );
             }
         }
 
@@ -89,15 +94,20 @@
             maxFilesize: 1025, // megabytes
             chunkSize: 250000, // bytes
             dictDefaultMessage: "Поместите сюда отредактированный файл с расширениями (doc, docx, pdf)",
-<!--            headers: {"page_header": String($("#page_header").is(":checked"))},-->
             success: function(file, response){
-                console.log(response);
                 if (isObject(response)) {
                     $("textarea#pdf").val(response["text"]);
                 } else {
                     $("textarea#pdf").val(response);
                 }
                 document.getElementsByClassName("dz-filename")[1].getElementsByTagName('span')[0].innerHTML = "Отредактированный файл"
+            },
+            error: function(file, response) {
+                Swal.fire(
+                    'Ошибка!',
+                    'Вы загрузили не поддерживаемый подтип файла или файл поврежден!',
+                    'error'
+                );
             }
         }
 
@@ -158,5 +168,6 @@
             window.URL.revokeObjectURL(blobUrl);
         };
     </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>
