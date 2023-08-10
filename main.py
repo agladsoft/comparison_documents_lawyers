@@ -50,7 +50,7 @@ def upload() -> Union[Response, str]:
         if any(docx_type in mime_type for docx_type in docx_types):
             docx: Docx = Docx(absolute_path_filename)
             return docx.get_text(mime_type)
-        return f"""Ошибка. Вы загрузили неподдерживаемый тип файла или файл поврежден.
+        return f"""Ошибка. Вы загрузили не поддерживаемый тип файла или файл поврежден.
 Имя загруженного файла: {os.path.basename(absolute_path_filename)}
 Тип загруженного файла: {mime_type}
         
@@ -60,7 +60,7 @@ def upload() -> Union[Response, str]:
 Для файла Microsoft Word:
 1. Откройте файл в приложении Microsoft Word
 2. В меню "Файл" выберете пункт "Сохранить как..."
-2. Выберите формат "Word Document (.docx)"
+3. Выберите формат "Word Document (.docx)
 
 Загрузите файл снова.
 
