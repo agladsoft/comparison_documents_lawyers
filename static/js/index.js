@@ -70,7 +70,7 @@ document.getElementById("unified").onclick= async ()=> {
     allButton.forEach(button => {
         button.disabled = true;
     });
-    let fetchPromise = await fetch("http://127.0.0.1:5000/unified/", {
+    let fetchPromise = await fetch("http://10.23.4.205:5000/unified/", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dictFile),
@@ -108,7 +108,7 @@ document.getElementById("downloadReport").onclick= async ()=> {
     allButton.forEach(button => {
         button.disabled = true;
     });
-    let fetchPromise = await fetch("http://127.0.0.1:5000/get_disagreement/", {
+    let fetchPromise = await fetch("http://10.23.4.205:5000/get_disagreement/", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dictFile),
