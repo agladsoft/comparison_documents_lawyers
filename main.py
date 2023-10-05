@@ -89,8 +89,6 @@ def get_unified_data():
 def restart():
     global restart_flag
     restart_flag = True
-    # Задержка, чтобы клиент мог увидеть сообщение о перезапуске
-    time.sleep(2)
     # Осуществляем перезапуск Flask-приложения
     os.execv(sys.executable, [sys.executable] + sys.argv)
 
