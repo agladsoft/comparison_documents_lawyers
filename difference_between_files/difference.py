@@ -79,8 +79,10 @@ def sequence_matcher(table,text1,text2,count_error,number):
 
     logger.info('Write document')
     for op, i1, i2, j1, j2 in sequence.get_opcodes():
-        run1 = paragraph1.add_run(text1[i1:i2])
-        run2 = paragraph2.add_run(text2[j1:j2])
+        run1 = re.sub(u"[^\u0020-\uD7FF\u0009\u000A\u000D\uE000-\uFFFD\U00010000-\U0010FFFF]+", '', text1[i1:i2])
+        run2 = re.sub(u"[^\u0020-\uD7FF\u0009\u000A\u000D\uE000-\uFFFD\U00010000-\U0010FFFF]+", '', text2[i1:i2])
+        run1 = paragraph1.add_run(run1)
+        run2 = paragraph2.add_run(run2)
         if op in ("delete", "insert"):
             if text1[i1:i2] not in skips:
                 run1.font.highlight_color = WD_COLOR_INDEX.YELLOW
@@ -102,18 +104,23 @@ def sequence_matcher(table,text1,text2,count_error,number):
         table._tbl.remove(table.rows[-1]._tr)
 
 
-
 def add_paragraph(table,text1,text2,number):
-    cells = table.add_row().cells
-    cells[0].width = Inches(0.6)
-    cells[1].width = Inches(3)
-    cells[2].width = Inches(3)
-    cells[0].text = number
-    paragraph1 = cells[1].paragraphs[0]
-    paragraph2 = cells[2].paragraphs[0]
-    paragraph1.add_run(text1)
-    paragraph2.add_run(text2)
-    return
+    try:
+        cells = table.add_row().cells
+        cells[0].width = Inches(0.6)
+        cells[1].width = Inches(3)
+        cells[2].width = Inches(3)
+        cells[0].text = number
+        paragraph1 = cells[1].paragraphs[0]
+        paragraph2 = cells[2].paragraphs[0]
+        text1 = re.sub(u"[^\u0020-\uD7FF\u0009\u000A\u000D\uE000-\uFFFD\U00010000-\U0010FFFF]+", '', text1)
+        text2 = re.sub(u"[^\u0020-\uD7FF\u0009\u000A\u000D\uE000-\uFFFD\U00010000-\U0010FFFF]+", '', text2)
+        paragraph1.add_run(text1)
+        paragraph2.add_run(text2)
+        return
+    except Exception as ex:
+        print(ex)
+        print()
 
 def flagg_append(flag_text,text1,text2,number,diff):
     flag_text[1].append(text1)
