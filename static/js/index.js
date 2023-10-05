@@ -1,3 +1,11 @@
+// Остановить процессы перед обновлением страницы
+$(window).on('beforeunload', function() {
+    $.post('/restart', function(response) {
+        console.log(response.message);
+    });
+});
+
+
 function isObject (n) {
           return Object.prototype.toString.call(n) === '[object Object]';
         }
