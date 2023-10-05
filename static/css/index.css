@@ -101,6 +101,16 @@ body::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb {
 .btn-13:active {
     top: 2px;
 }
+.btn-13:disabled {
+    cursor: not-allowed;
+    background-color: #FF0000; /* Цвет фона кнопки для неактивных кнопок */
+    background-image: none;
+    color: #666; /* Цвет текста для неактивных кнопок */
+    border: 1px solid #999; /* Граница для неактивных кнопок */
+}
+.btn-13:disabled::after {
+    content: none; /* или content: ""; */
+}
 
 
 /* Input */
