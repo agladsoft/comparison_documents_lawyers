@@ -1,3 +1,5 @@
+import sys
+import time
 import magic
 from pdf_ import PDF
 from docx_ import Docx
@@ -8,9 +10,15 @@ from unified.split_scanned_by_paragraph import *
 from difference_between_files.difference import save_disagreement
 from flask import render_template, request, jsonify, Response, make_response
 
+
+# Флаг для определения необходимости перезапуска
+restart_flag = False
+
+
 @app.get("/")
 def index() -> str:
     return render_template("index.html")
+
 
 def join_chunks_in_file(file, absolute_path_filename) -> Response:
     current_chunk = int(request.form['dzchunkindex'])
@@ -28,6 +36,7 @@ def join_chunks_in_file(file, absolute_path_filename) -> Response:
             int(request.form['dztotalfilesize']):
         return make_response(('Size mismatch', 500))
 
+
 def get_file_path() -> Tuple[FileStorage, str]:
     file: FileStorage = request.files['file']
     filename: str = file.filename
@@ -36,6 +45,7 @@ def get_file_path() -> Tuple[FileStorage, str]:
     else:
         absolute_path_filename = f"{dir_name_pdf}/{file.filename}"
     return file, absolute_path_filename
+
 
 @app.post("/upload")
 def upload() -> Union[Response, str]:
@@ -52,6 +62,7 @@ def upload() -> Union[Response, str]:
             return docx.get_text(mime_type)
         raise "Ошибка. Вы загрузили не поддерживаемый подтип файла или файл поврежден."
     return absolute_path_filename
+
 
 @app.post("/get_disagreement/")
 def get_disagreement():
@@ -74,5 +85,15 @@ def get_unified_data():
     return jsonify(dict_data)
 
 
+@app.post("/restart/")
+def restart():
+    global restart_flag
+    restart_flag = True
+    # Задержка, чтобы клиент мог увидеть сообщение о перезапуске
+    time.sleep(2)
+    # Осуществляем перезапуск Flask-приложения
+    os.execv(sys.executable, [sys.executable] + sys.argv)
+
+
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)

@@ -56,6 +56,15 @@
 
     <button id="downloadReport" class="custom-btn btn-13" type="submit">СКАЧАТЬ</button>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // Остановить процессы перед обновлением страницы
+    $(window).on('beforeunload', function() {
+        $.post('/restart', function(response) {
+            console.log(response.message);
+        });
+    });
+</script>
 <script type="application/javascript">
         function isObject (n) {
           return Object.prototype.toString.call(n) === '[object Object]';
