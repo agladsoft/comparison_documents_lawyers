@@ -71,7 +71,7 @@ body::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb {
     background-color: #3C99DC;
     background-image: linear-gradient(315deg, #3C99DC 0%, #66D3FA 74%);
     border: none;
-    z-index: 1;
+    // z-index: 1;
 }
 .btn-13:after {
     position: absolute;
