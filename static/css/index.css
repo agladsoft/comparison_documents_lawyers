@@ -179,3 +179,95 @@ input:focus, textarea:focus {
     from{ bottom:-100px; opacity:0 }
     to{ bottom:0; opacity:1 }
 }
+
+
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	font-family: 'Roboto Slab', serif;
+	font-size: 1.2rem;
+	margin: 0;
+	padding: 1rem;
+	display: grid;
+	place-items: center;
+	min-height: 100vh;
+}
+
+ol {
+	max-width: 700px;
+	position: relative;
+}
+
+ol::before {
+	content: '';
+	width: 0.5rem;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 15%;
+	background: peachpuff;
+	z-index: -1;
+}
+
+li {
+	padding: 0.5rem 1.5rem 1rem;
+	border-radius: 1.5rem;
+	background: peachpuff;
+}
+
+li + li {
+	margin-top: 1rem;
+}
+
+::marker {
+	font-weight: 600;
+	color: tomato;
+	font-size: 1.8rem;
+}
+
+
+/* The Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.highlighted {
+  background-color: green;
+  color: white;
+}

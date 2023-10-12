@@ -64,6 +64,32 @@ def upload() -> Union[Response, str]:
     return absolute_path_filename
 
 
+items: dict = {
+    "Получение количества файлов pdf в многостраничном файле": None,
+    "Получение количества разбитых файлов pdf": None,
+    "Поворот изображений на прямой угол": None,
+    "Выравнивание изображений под маленьким углом": None,
+    "Классификация изображений": None,
+    "Распознавание текста изображения": None,
+}
+
+
+@app.post("/highlight/")
+def highlight():
+    list_items: list = [key for key, value in items.items() if value]
+    return list_items
+
+
+@app.post("/get_logs/")
+def get_logs():
+    response = request.json
+    highlighted_item = response.get("logs")
+    highlighted_value = response.get("value")
+    if highlighted_item in items:
+        items[highlighted_item] = highlighted_value
+    return "Received"
+
+
 @app.post("/get_disagreement/")
 def get_disagreement():
     response = request.json

@@ -5,6 +5,72 @@ $(window).on('beforeunload', function() {
     });
 });
 
+// Get the modal
+var modal = document.getElementById("myModal");
+// Get the button that opens the modal
+var btn = document.getElementById("show_logs");
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+// When the user clicks on the button, open the modal
+btn.onclick = function() {
+  modal.style.display = "block";
+}
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+
+const myList = document.getElementById("myList");
+
+// Получаем текст элементов ul
+const listItems = myList.getElementsByTagName("li");
+
+//// Функция, которая подсвечивает элемент зеленым цветом
+//function highlightItem(itemText) {
+//    for (let i = 0; i < listItems.length; i++) {
+//        const listItem = listItems[i];
+//        if (listItem.textContent === itemText) {
+//            listItem.classList.add("highlighted");
+//        } else {
+//            listItem.classList.remove("highlighted");
+//        }
+//    }
+//}
+//
+//// Вызываем функцию для выделения элемента
+//highlightItem("{{ highlighted_item }}");
+
+
+
+function getHighlightItem() {
+    setInterval(async function() {
+        const response = await fetch("/highlight/", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                mode: 'cors'
+            });
+        const array_text = await response.json();
+        const listItems = myList.getElementsByTagName("li");
+        for (const element of array_text) {
+            for (let i = 0; i < listItems.length; i++) {
+                const listItem = listItems[i];
+                if (listItem.textContent == element) {
+                    listItem.classList.add("highlighted");
+                }
+            }
+        }
+    }, 5000);
+}
+
+getHighlightItem()
+
+
 
 function isObject (n) {
           return Object.prototype.toString.call(n) === '[object Object]';
