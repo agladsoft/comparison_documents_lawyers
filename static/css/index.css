@@ -202,7 +202,7 @@ input:focus, textarea:focus {
   margin: 15% auto; /* 15% from the top and centered */
   padding: 20px;
   border: 1px solid #888;
-  width: 80%; /* Could be more or less, depending on screen size */
+  width: 50%; /* Could be more or less, depending on screen size */
 }
 
 * {
@@ -224,17 +224,6 @@ ol {
 	position: relative;
 }
 
-ol::before {
-	content: '';
-	width: 0.5rem;
-	height: 100%;
-	position: absolute;
-	top: 0;
-	left: 15%;
-	background: peachpuff;
-	z-index: -1;
-}
-
 li {
 	padding: 0.5rem 1.5rem 1rem;
 	border-radius: 1.5rem;
@@ -251,6 +240,11 @@ li + li {
 	font-size: 1.8rem;
 }
 
+.highlighted {
+  background-color: green;
+  color: white;
+}
+
 
 /* The Close Button */
 .close {
@@ -265,9 +259,4 @@ li + li {
   color: black;
   text-decoration: none;
   cursor: pointer;
-}
-
-.highlighted {
-  background-color: green;
-  color: white;
 }
