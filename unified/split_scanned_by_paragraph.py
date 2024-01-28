@@ -1,6 +1,7 @@
 from unified.paragraph import paragraph_factory, chapters_by_token_factory, MatchedChapter, ChapterSide, logger
 from unified.paragraph import chapters_by_best_be_token_factory, chapters_by_best_bs_token_factory
 from typing import List
+import heapq as hq
 # logger = logging.getLogger(__name__)
 
 
@@ -37,6 +38,7 @@ def write_chapters_to_files(head_chapter, filename_prefix, thr):
 
 
 def spawn_chapters(head_chapter: MatchedChapter, thr):
+    next_reasonable_thr_heap = []
     next_chapter = head_chapter
     while next_chapter:
         current_chapter = next_chapter
@@ -51,6 +53,11 @@ def spawn_chapters(head_chapter: MatchedChapter, thr):
             if current_chapter is head_chapter:
                 head_chapter = parent_chapter
             current_chapter = child_chapter
+
+            if parent_chapter.best_border_match:
+                hq.heappush(next_reasonable_thr_heap, (parent_chapter.best_border_match.border_rate, parent_chapter))
+            if child_chapter.best_border_match:
+                hq.heappush(next_reasonable_thr_heap, (child_chapter.best_border_match.border_rate, child_chapter))
     return head_chapter
 
 
