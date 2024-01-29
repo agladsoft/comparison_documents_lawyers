@@ -5,6 +5,18 @@ import heapq as hq
 # logger = logging.getLogger(__name__)
 
 
+class ReasonableThreshold(object):
+    def __init__(self, chapter: MatchedChapter):
+        self.chapter = chapter
+        self.reasonable_thr = chapter.best_border_match.border_rate if chapter.best_border_match else None
+
+    def __lt__(self, other):
+        return self.reasonable_thr < other.reasonable_thr
+
+    def __repr__(self):
+        return f"X({self.reasonable_thr} for MatchedChapter {self.chapter})"
+
+
 def write_chapters_to_files(head_chapter, filename_prefix, thr):
     text_left = ''
     text_right = ''
@@ -38,26 +50,29 @@ def write_chapters_to_files(head_chapter, filename_prefix, thr):
 
 
 def spawn_chapters(head_chapter: MatchedChapter, thr):
-    next_reasonable_thr_heap = []
-    next_chapter = head_chapter
-    while next_chapter:
-        current_chapter = next_chapter
-        next_chapter = next_chapter.next
-        while current_chapter.spawn_possible(thr):
-            logger.info(f'current_chapter is {current_chapter}')
-            parent_chapter, child_chapter = current_chapter.spawn_child(thr)
-            current_chapter.is_obsolete = True
-            # all_m_chapters[parent_chapter.se2_id] = parent_chapter
-            # all_m_chapters[child_chapter.se2_id] = child_chapter
+    # next_chapter = head_chapter
+    next_reasonable_thr_heap = [ReasonableThreshold(head_chapter)]
+    while (next_reasonable_thr_heap and
+           next_reasonable_thr_heap[0].reasonable_thr is not None and
+           next_reasonable_thr_heap[0].reasonable_thr <= thr):
+        current_chapter = hq.heappop(next_reasonable_thr_heap).chapter
+        # next_chapter = next_chapter.next
+        logger.info(f'current_chapter is {current_chapter}')
+        # TODO: speedup  current_chapter.spawn_child
+        # TODO: multiprocessing workers for current_chapter.spawn_child - check structures to lock against race
+        parent_chapter, child_chapter = current_chapter.spawn_child(thr)
+        current_chapter.is_obsolete = True
+        # all_m_chapters[parent_chapter.se2_id] = parent_chapter
+        # all_m_chapters[child_chapter.se2_id] = child_chapter
 
-            if current_chapter is head_chapter:
-                head_chapter = parent_chapter
-            current_chapter = child_chapter
+        if current_chapter is head_chapter:
+            head_chapter = parent_chapter
+        # current_chapter = child_chapter
 
-            if parent_chapter.best_border_match:
-                hq.heappush(next_reasonable_thr_heap, (parent_chapter.best_border_match.border_rate, parent_chapter))
-            if child_chapter.best_border_match:
-                hq.heappush(next_reasonable_thr_heap, (child_chapter.best_border_match.border_rate, child_chapter))
+        if parent_chapter.best_border_match:
+            hq.heappush(next_reasonable_thr_heap, ReasonableThreshold(parent_chapter))
+        if child_chapter.best_border_match:
+            hq.heappush(next_reasonable_thr_heap, ReasonableThreshold(child_chapter))
     return head_chapter
 
 
@@ -84,13 +99,8 @@ def flatten_right_paragraphs_text(head_chapter):
 def match_chapter_1(left_chapter, right_chapter, max_thr):
     logger.info('MatchedChapter - 1st iteration')
     head_chapter = MatchedChapter(left_chapter, right_chapter)
-    thr = .1
-    while thr < max_thr:
-        logger.info(f'Next thr cycle started.! thr is {thr}')
-        head_chapter = spawn_chapters(head_chapter, thr)
-        # write_chapters_to_files(head_chapter, 'thr', thr)
-
-        thr *= 1 + 0.618
+    logger.info(f'Next thr cycle started.! thr is {max_thr}')
+    head_chapter = spawn_chapters(head_chapter, max_thr)
     return head_chapter
 
 
@@ -104,11 +114,7 @@ def match_chapter_2(left_chapter, head_chapter, max_thr):
 
     #       2. run MatchedChapter spawn_subchapter cycle once again
     logger.info('MatchedChapter - 2nd iteration')
-    thr = .1
-    while thr < max_thr:
-        head_chapter = spawn_chapters(head_chapter, thr)
-        # write_chapters_to_files(head_chapter, 'thr2', thr)
-        thr *= 1 + 0.618
+    head_chapter = spawn_chapters(head_chapter, max_thr)
 
     return head_chapter
 
@@ -118,13 +124,9 @@ def match_chapter_bt(head_chapter, max_thr):
     head_chapter_bt = chapters_by_token_factory(head_chapter)
 
     logger.info('MatchedChapterByToken iteration')
-    thr = .1
-    while thr < max_thr * pow(0.618, 1):
-        head_chapter_bt = spawn_chapters(head_chapter_bt, thr)
-        left_final, right_final = write_chapters_to_files(head_chapter_bt, 'bt_thr', thr)
 
-        thr *= 1 + 0.618
-        print(thr)
+    head_chapter_bt = spawn_chapters(head_chapter_bt, max_thr)
+    left_final, right_final = write_chapters_to_files(head_chapter_bt, 'bt_thr', max_thr)
     a = 1
     return left_final, right_final, head_chapter_bt
 
@@ -133,13 +135,9 @@ def match_chapter_be_bt(head_chapter_bt, max_thr):
     logger.info('chapters_by_best_be_token_factory...')
     head_chapter_best_be_bt = chapters_by_best_be_token_factory(head_chapter_bt)
     # logger.info('MatchedChapterByBestToken iteration')
-    thr = .1
-    while thr < max_thr * pow(0.618, 8):  # 15 mean run only once
-        head_chapter_best_be_bt = spawn_chapters(head_chapter_best_be_bt, thr)
-        left_final, right_final = write_chapters_to_files(head_chapter_best_be_bt, 'best_be_bt_thr', thr)
 
-        thr *= 1 + 0.618
-        print(thr)
+    head_chapter_best_be_bt = spawn_chapters(head_chapter_best_be_bt, max_thr)
+    left_final, right_final = write_chapters_to_files(head_chapter_best_be_bt, 'best_be_bt_thr', max_thr)
 
     return left_final, right_final, head_chapter_best_be_bt
 
@@ -148,13 +146,8 @@ def match_chapter_bs_bt(head_chapter_bt, max_thr):
     logger.info('chapters_by_best_be_token_factory...')
     head_chapter_best = chapters_by_best_bs_token_factory(head_chapter_bt)
     # logger.info('MatchedChapterByBestToken iteration')
-    thr = .1
-    while thr < max_thr * pow(0.618, 8):  # 15 mean run only once
-        head_chapter_best = spawn_chapters(head_chapter_best, thr)
-        left_final, right_final = write_chapters_to_files(head_chapter_best, 'best_be_bt_thr', thr)
-
-        thr *= 1 + 0.618
-        print(thr)
+    head_chapter_best = spawn_chapters(head_chapter_best, max_thr)
+    left_final, right_final = write_chapters_to_files(head_chapter_best, 'best_be_bt_thr', max_thr)
 
     return left_final, right_final, head_chapter_best
 
