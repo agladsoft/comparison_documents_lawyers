@@ -90,6 +90,7 @@ def get_unified_data():
 def restart():
     global restart_flag
     restart_flag = True
+    logger.info('Restart project')
     # Осуществляем перезапуск Flask-приложения
     os.execv(sys.executable, [sys.executable] + sys.argv)
 
