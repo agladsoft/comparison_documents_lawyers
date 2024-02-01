@@ -76,8 +76,8 @@ def get_unified_data():
     max_thr = response["threshold"]
     left_text = response["docx"].split("\n")
     right_text = response["pdf"].split("\n")
-    left_text = [i for i in left_text if i != '\n']
-    right_text = [i for i in right_text if i != '\n']
+    left_text = [i for i in left_text if i not in ('\n', '') and not i.isspace()]
+    right_text = [i for i in right_text if i not in ('\n', '') and not i.isspace()]
     left_final, right_final = main(left_text, right_text, max_thr)
     dict_data = {
         "docx": left_final,
