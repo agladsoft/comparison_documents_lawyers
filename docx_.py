@@ -20,6 +20,10 @@ class Docx(object):
     def clean_special_chars(lst: List[str]) -> List[str]:
         lst = [s.replace(u"\u202F", " ") for s in lst]
         lst = [re.sub(' +', ' ', s) for s in lst]
+        lst = [re.sub('--\n', '', s) for s in lst]
+        lst = [re.sub('--\t', '', s) for s in lst]
+        lst = [re.sub('\t', '', s) for s in lst]
+        lst = [s for s in lst if s.strip()]
         return lst
 
     @staticmethod
