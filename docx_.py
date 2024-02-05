@@ -69,7 +69,7 @@ class Docx(object):
                 current_paragraph = current_paragraph.replace("\n", " ")
                 current_paragraph += pl
         self.save_txt(paragraphs)
-        return "".join(paragraphs)
+        return "\n".join(paragraphs)
 
     def refactor_page_header(self, flag) -> None:
         if flag:
