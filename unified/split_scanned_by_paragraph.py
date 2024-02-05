@@ -49,9 +49,18 @@ def write_chapters_to_files(head_chapter, filename_prefix, thr):
     return text_left, text_right
 
 
+def reasonable_threshold_fabric(head_chapter: MatchedChapter, thr):
+    current_chapter = head_chapter
+    while current_chapter:
+        rt = ReasonableThreshold(current_chapter)
+        if rt.reasonable_thr is not None and rt.reasonable_thr <= thr:
+            yield rt
+        current_chapter = current_chapter.next
+
 def spawn_chapters(head_chapter: MatchedChapter, thr):
     # next_chapter = head_chapter
-    next_reasonable_thr_heap = [ReasonableThreshold(head_chapter)]
+    next_reasonable_thr_heap = list(reasonable_threshold_fabric(head_chapter, thr))
+    hq.heapify(next_reasonable_thr_heap)
     while (next_reasonable_thr_heap and
            next_reasonable_thr_heap[0].reasonable_thr is not None and
            next_reasonable_thr_heap[0].reasonable_thr <= thr):
@@ -169,9 +178,9 @@ def main(source_left: List[str], source_right: List[str], max_thr):
 
 
 if __name__ == '__main__':
-    with open('left.txt') as f:
+    with open('left_mondi_short.txt') as f:
         left_text_ = f.readlines()
-    with open('right.txt') as f:
+    with open('right_mondi_short.txt') as f:
         right_text_ = f.readlines()
 
     max_thr_ = 200
@@ -183,3 +192,6 @@ if __name__ == '__main__':
 
     with open('output_right_final.txt', 'w') as f_right:
         f_right.write(right_final_)
+
+    points = len(left_final_.split('\n\n'))
+    logger.info(f"points={points}")
