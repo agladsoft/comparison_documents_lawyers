@@ -14,6 +14,11 @@ from flask import render_template, request, jsonify, Response, make_response
 restart_flag = False
 
 
+def preproc(text: str):
+    result = [i for i in text if i not in ('\n', '') and not i.isspace()]
+    return result
+
+
 @app.get("/")
 def index() -> str:
     return render_template("index.html")
@@ -76,8 +81,8 @@ def get_unified_data():
     max_thr = response["threshold"]
     left_text = response["docx"].split("\n")
     right_text = response["pdf"].split("\n")
-    left_text = [i for i in left_text if i not in ('\n', '') and not i.isspace()]
-    right_text = [i for i in right_text if i not in ('\n', '') and not i.isspace()]
+    left_text = preproc(left_text)
+    right_text = preproc(right_text)
     left_final, right_final = main(left_text, right_text, max_thr)
     dict_data = {
         "docx": left_final,

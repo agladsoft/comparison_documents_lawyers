@@ -171,7 +171,7 @@ def save_disagreement(file1: str, file2: str, count_error: int, flag: bool, file
                 continue
             else:
                 if len(flag_text[1])>1 :
-                    if  any([i for i in flag_text[3]]):
+                    if any([i for i in flag_text[3]]):
                         sequence_matcher(table, '\n'.join(flag_text[1]), '\n'.join(flag_text[2]), count_error, flag_text[0])
                         flag_text = [0, [], [],[]]
                         flagg_append(flag_text, text1, text2, number, diff)

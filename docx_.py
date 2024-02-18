@@ -1,8 +1,10 @@
+from __init__ import *
 import re
 import subprocess
 import fuzzywuzzy
 import pdfplumber
-from __init__ import *
+import logging
+import os
 from typing import List
 from docx import Document
 from collections import deque
@@ -68,7 +70,7 @@ class Docx(object):
             else:
                 current_paragraph = current_paragraph.replace("\n", " ")
                 current_paragraph += pl
-        self.save_txt(paragraphs)
+        # self.save_txt(paragraphs)
         return "".join(paragraphs)
 
     def refactor_page_header(self, flag) -> None:
@@ -95,8 +97,8 @@ class Docx(object):
         for text in texts.pages:
             list_pdf_text.extend(line.strip() + '\n' for line in text.extract_text().split('\n'))
         list_docx_text = [line.strip() + '\n' for line in docx_text.text.split('\n')]
-        with open(f"{os.path.dirname(self.absolute_path_filename)}/list_pdf_text.txt", "w") as f:
-            f.writelines(list_pdf_text)
-        with open(f"{os.path.dirname(self.absolute_path_filename)}/list_docx_text.txt", "w") as f:
-            f.writelines(list_docx_text)
+        # with open(f"{os.path.dirname(self.absolute_path_filename)}/list_pdf_text.txt", "w") as f:
+        #     f.writelines(list_pdf_text)
+        # with open(f"{os.path.dirname(self.absolute_path_filename)}/list_docx_text.txt", "w") as f:
+        #     f.writelines(list_docx_text)
         return self.format_paragraphs(list_docx_text, list_pdf_text)
